@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	viper.SetConfigFile("./pkg/common/envs/.env")
+	viper.SetConfigFile("/pkg/common/envs/.env")
 	viper.ReadInConfig()
 
 	port := viper.Get("PORT").(string)
@@ -21,8 +21,8 @@ func main() {
 	r := gin.Default()
 	h := db.Init(dbUrl)
 
-	r.Static("/static", "./pkg/webview/static")
-	r.LoadHTMLGlob("pkg/webview/templates/*")
+	r.Static("/static", "/pkg/webview/static")
+	r.LoadHTMLGlob("/pkg/webview/templates/*")
 	r.GET("/", webview.Index)
 	r.GET("/login", webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
