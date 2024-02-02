@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
@@ -15,8 +17,10 @@ func main() {
 	viper.SetConfigFile("/pkg/common/envs/.env")
 	viper.ReadInConfig()
 
-	port := viper.Get("PORT").(string)
-	dbUrl := viper.Get("DB_URL").(string)
+	// port := viper.Get("PORT").(string)
+	// dbUrl := viper.Get("DB_URL").(string)
+	port := os.Getenv("PORT")
+	dbUrl := os.Getenv("DB_URL")
 
 	r := gin.Default()
 	h := db.Init(dbUrl)

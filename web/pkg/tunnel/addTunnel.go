@@ -1,6 +1,8 @@
 package tunnels
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 	"os"
 
@@ -36,8 +38,8 @@ func (h handler) AddTunnel(c *gin.Context) {
 	tunnel.IPv4Remote = body.IPv4Remote
 	tunnel.UserID = user.ID
 	tunnel.IPv4Local = getLocalIPv4()
-	tunnel.PD = "pd prefix"
-	tunnel.P2P = "p2p prefix"
+	tunnel.PD = getPrefix(64)
+	tunnel.P2P = getPrefix(127)
 	tunnel.Configured = false
 
 	if result := h.DB.Create(&tunnel); result.Error != nil {
@@ -62,10 +64,24 @@ func getLocalIPv4() string {
 	return addr
 }
 
-func getPD() string {
-	return "pd/64 prefix"
-}
+func getPrefix(prefixlen int) string {
+	requestURL := fmt.Sprintf("http://%s/acquire?prefixlen=%d", os.Getenv("IPAM"), prefixlen)
+	req, err := http.NewRequest(http.MethodGet, requestURL, nil)
+	if err != nil {
+		fmt.Printf("client: could not create request: %s\n", err)
+		return ""
+	}
 
-func getP2P() string {
-	return "p2p/127 prefix"
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		fmt.Printf("client: error making http request: %s\n", err)
+		return ""
+	}
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Printf("client: could not read response body: %s\n", err)
+		return ""
+	}
+	fmt.Printf("client: response body: %s\n", resBody)
+	return string(resBody)
 }
