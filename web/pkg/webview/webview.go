@@ -17,3 +17,7 @@ func Register(c *gin.Context) {
 		"Title": "Tunnel Broker register",
 	})
 }
+
+func Index(c *gin.Context) {
+	c.Redirect(http.StatusTemporaryRedirect, "/login")
+}

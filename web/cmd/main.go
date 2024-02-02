@@ -1,8 +1,6 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
@@ -25,7 +23,7 @@ func main() {
 
 	r.Static("/static", "./pkg/webview/static")
 	r.LoadHTMLGlob("pkg/webview/templates/*")
-	r.GET("/", index)
+	r.GET("/", webview.Index)
 	r.GET("/login", webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
@@ -38,8 +36,4 @@ func main() {
 	tunnels.RegisterRoutes(r, h)
 
 	r.Run(port)
-}
-
-func index(c *gin.Context) {
-	c.Redirect(http.StatusTemporaryRedirect, "/login")
 }
