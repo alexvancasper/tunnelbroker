@@ -4,6 +4,7 @@ services:
   ipam:
     build:
       context: ipam
+    image: alex129/ipam
     restart: always
     ports:
       - 1034:1034
@@ -13,6 +14,7 @@ services:
   web:
     build:
       context: web
+    image: alex129/web
     restart: always
     ports:
         - "3000:3000"

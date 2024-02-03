@@ -73,7 +73,7 @@ func getLocalIPv4(logf *logrus.Logger) string {
 	addr := os.Getenv("IPv4LOCALADDR")
 	if len(addr) == 0 {
 		l.Errorf("Environment variable IPv4LOCALADDR is empty, got default value")
-		return "185.185.58.180"
+		return ""
 	}
 	return addr
 }
