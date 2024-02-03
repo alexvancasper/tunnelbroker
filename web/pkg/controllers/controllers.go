@@ -61,8 +61,8 @@ func Signup(c *gin.Context) {
 func Login(c *gin.Context) {
 	// Get email & pass off req body
 	var body struct {
-		Email    string //`json:"login"`
-		Password string //`json:"password"`
+		Email    string `json:"login"`
+		Password string `json:"password"`
 	}
 
 	if c.Bind(&body) != nil {
