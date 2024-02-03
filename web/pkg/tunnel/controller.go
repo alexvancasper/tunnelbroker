@@ -2,16 +2,19 @@ package tunnels
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type handler struct {
-	DB *gorm.DB
+	DB   *gorm.DB
+	Logf *logrus.Logger
 }
 
-func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
+func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 	h := &handler{
-		DB: db,
+		DB:   db,
+		Logf: logf,
 	}
 
 	routes := r.Group("/tunnel/:api")

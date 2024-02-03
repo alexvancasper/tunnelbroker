@@ -6,16 +6,19 @@ import (
 	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type handler struct {
-	DB *gorm.DB
+	DB   *gorm.DB
+	Logf *logrus.Logger
 }
 
-func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
+func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 	h := &handler{
-		DB: db,
+		DB:   db,
+		Logf: logf,
 	}
 
 	routes := r.Group("/user", middleware.RequireAuth)

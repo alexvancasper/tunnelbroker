@@ -169,9 +169,14 @@ window.onload = getPublicIP()
             <td> {{ $element.IPv4Local }}  </td>
         </tr>
         <tr>
-            <th> IPv6 P2P network </th>
-            <td> {{ $element.P2P }}  </td>
+            <th> IPv6 client address </th>
+            <td> {{ $element.IPv6ClientEndpoint }}  </td>
         </tr>    
+        <tr>
+            <th> IPv6 server address </th>
+            <td> {{ $element.IPv6ServerEndpoint }}  </td>
+        </tr>    
+
         <tr>
             <th> IPv6 PD prefix </th>
             <td> {{ $element.PD }}  </td>

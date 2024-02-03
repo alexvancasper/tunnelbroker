@@ -9,11 +9,26 @@ import (
 	tunnels "github.com/alexvancasper/TunnelBroker/web/pkg/tunnel"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/users"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/webview"
+	formatter "github.com/fabienm/go-logrus-formatters"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func main() {
+
+	//Initialize Logging connections
+	var MyLogger = logrus.New()
+
+	gelfFmt := formatter.NewGelf("WEB service")
+	MyLogger.SetFormatter(gelfFmt)
+	MyLogger.SetOutput(os.Stdout)
+	loglevel, err := logrus.ParseLevel("debug")
+	if err != nil {
+		MyLogger.WithField("function", "main").Fatalf("error %v", err)
+	}
+	MyLogger.SetLevel(loglevel)
+
 	viper.SetConfigFile("/pkg/common/envs/.env")
 	viper.ReadInConfig()
 
@@ -36,8 +51,8 @@ func main() {
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)
 
-	users.RegisterRoutes(r, h)
-	tunnels.RegisterRoutes(r, h)
+	users.RegisterRoutes(r, h, MyLogger)
+	tunnels.RegisterRoutes(r, h, MyLogger)
 
 	r.Run(port)
 }

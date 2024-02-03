@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  ipam:
+    build:
+      context: ipam
+    restart: always
+    ports:
+      - 1034:1034
+    environment:
+      - PORT=1034
+      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+  web:
+    build:
+      context: web
+    restart: always
+    ports:
+        - "3000:3000"
+    environment:
+      - IPv4LOCALADDR=185.185.58.180
+      - IPAM=ipam:1034
+      - PORT=:3000
+      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+  postgresdb:
+    image: postgres
+    tty: true
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=postgresql
+      - POSTGRES_DB=tunnelbroker
+  # rabbitmq:
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - 15672:15672
+  #   environment:
+  #     - RABBITMQ_DEFAULT_USER=rabbit
+  #     - RABBITMQ_DEFAULT_PASS=rabbitwhole
+  #     - RABBITMQ_DEFAULT_VHOST=my_vhost
+
+# $ docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management      
