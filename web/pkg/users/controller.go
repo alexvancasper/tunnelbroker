@@ -23,7 +23,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 
 	routes := r.Group("/user", middleware.RequireAuth)
 	routes.GET("/", h.GetUser)
-	routes.PUT("/", h.UpdateUser)
+	// routes.PUT("/", h.UpdateUser)
 	routes.DELETE("/", h.DeleteUser)
 	// routes.GET("/", h.GetUsers)
 	// routes.POST("/", h.AddUser)

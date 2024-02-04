@@ -20,7 +20,7 @@ func main() {
 	//Initialize Logging connections
 	var MyLogger = logrus.New()
 
-	gelfFmt := formatter.NewGelf("WEB service")
+	gelfFmt := formatter.NewGelf("API")
 	MyLogger.SetFormatter(gelfFmt)
 	MyLogger.SetOutput(os.Stdout)
 	loglevel, err := logrus.ParseLevel("debug")
@@ -40,10 +40,10 @@ func main() {
 	r := gin.Default()
 	h := db.Init(dbUrl)
 
-	r.Static("/static", "/pkg/webview/static")
-	r.LoadHTMLGlob("/pkg/webview/templates/*")
+	// r.Static("/static", "/pkg/webview/static")
+	// r.LoadHTMLGlob("/pkg/webview/templates/*")
 	r.GET("/", webview.Index)
-	r.GET("/login", webview.Login)
+	// r.GET("/login", webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
 	// r.GET("/validate", middleware.RequireAuth, controllers.Validate)

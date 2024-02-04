@@ -21,9 +21,9 @@ func (h handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "user.html", gin.H{
-		"Title": "User room",
-		"User":  user,
-	})
-	// c.JSON(http.StatusOK, &user)
+	// c.HTML(http.StatusOK, "user.html", gin.H{
+	// 	"Title": "User room",
+	// 	"User":  user,
+	// })
+	c.JSON(http.StatusOK, &user)
 }

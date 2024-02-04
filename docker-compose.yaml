@@ -19,7 +19,7 @@ services:
     ports:
         - "3000:3000"
     environment:
-      - IPv4LOCALADDR=185.185.58.180
+      - IPv4LOCALADDR=1.1.1.1
       - IPAM=ipam:1034
       - PORT=:3000
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
