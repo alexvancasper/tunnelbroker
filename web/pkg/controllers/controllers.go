@@ -55,7 +55,7 @@ func Signup(c *gin.Context) {
 	}
 
 	// Respond
-	c.JSON(http.StatusOK, gin.H{})
+	c.JSON(http.StatusCreated, gin.H{"mesage": "User created"})
 }
 
 func Login(c *gin.Context) {
@@ -114,18 +114,17 @@ func Login(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, true)
 
-	// c.JSON(http.StatusOK, gin.H{})
-	c.Redirect(http.StatusFound, "/user/")
+	c.JSON(http.StatusOK, gin.H{"message": "logged in successfully"})
 }
 
 func Logout(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 	if err != nil || len(tokenString) <= 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "header is not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cookie is not found"})
 	}
 	c.SetCookie("Authorization", tokenString, 1, "", "", false, true)
-	// c.JSON(http.StatusOK, gin.H{})
-	c.Redirect(http.StatusFound, "/login")
+	c.JSON(http.StatusOK, gin.H{"message": "user logout"})
+	// c.Redirect(http.StatusFound, "/login")
 }
 
 func Validate(c *gin.Context) {
