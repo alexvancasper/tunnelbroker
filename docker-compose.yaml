@@ -4,24 +4,24 @@ services:
   ipam:
     build:
       context: ipam
-    image: alex129/ipam
+    # image: alex129/ipam
     restart: always
     ports:
       - 1034:1034
     environment:
       - PORT=1034
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
-  web:
+  api:
     build:
-      context: web
-    image: alex129/web
+      context: api
+    # image: alex129/web
     restart: always
     ports:
-        - "3000:3000"
+        - "8080:8080"
     environment:
       - IPv4LOCALADDR=1.1.1.1
       - IPAM=ipam:1034
-      - PORT=:3000
+      - PORT=:8080
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
   postgresdb:
     image: postgres
