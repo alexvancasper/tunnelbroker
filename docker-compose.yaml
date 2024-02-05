@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  ipam:
-    build:
-      context: ipam
-    # image: alex129/ipam
-    restart: always
-    ports:
-      - 1034:1034
-    environment:
-      - PORT=1034
-      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+  # web:
+  #   build:
+  #     context: web
+  #   # image: alex129/web
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #   environment:
+  #     - API=api:8080
+  #     - PORT=80
   api:
     build:
       context: api
@@ -22,6 +22,16 @@ services:
       - IPv4LOCALADDR=1.1.1.1
       - IPAM=ipam:1034
       - PORT=:8080
+      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+  ipam:
+    build:
+      context: ipam
+    # image: alex129/ipam
+    restart: always
+    ports:
+      - 1034:1034
+    environment:
+      - PORT=1034
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
   postgresdb:
     image: postgres

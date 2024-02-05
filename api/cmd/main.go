@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
@@ -10,6 +11,7 @@ import (
 	"github.com/alexvancasper/TunnelBroker/web/pkg/users"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/webview"
 	formatter "github.com/fabienm/go-logrus-formatters"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
@@ -40,6 +42,13 @@ func main() {
 	r := gin.Default()
 	h := db.Init(dbUrl)
 
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://127.0.0.1:8080", "http://127.0.0.1:8000"}
+	config.AllowHeaders = []string{"content-type", "content-lenght", "authorization", "origin", "Set-Cookie"}
+	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
+	config.AllowCredentials = true
+	config.MaxAge = 1 * time.Minute
+	r.Use(cors.New(config))
 	// r.Static("/static", "/pkg/webview/static")
 	// r.LoadHTMLGlob("/pkg/webview/templates/*")
 	r.GET("/", webview.Index)
@@ -55,4 +64,18 @@ func main() {
 	tunnels.RegisterRoutes(r, h, MyLogger)
 
 	r.Run(port)
+}
+
+func CORSMiddleware(c *gin.Context) {
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+	c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+	if c.Request.Method == "OPTIONS" {
+		c.AbortWithStatus(204)
+		return
+	}
+
+	c.Next()
 }

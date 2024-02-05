@@ -138,7 +138,7 @@ curl -v --request GET \
 используем APIKEY 
 ```sh
 curl -v --request POST \
---url http://localhost:3000/tunnel/0e570d91c35e11ee8d7a0242c0a89004/ \
+--url http://localhost:8080/tunnel/0e570d91c35e11ee8d7a0242c0a89004/ \
 --header 'Content-Type: application/json' \
 --data '{ 
 "tunnelname": "ipv4-to-ipv6",
