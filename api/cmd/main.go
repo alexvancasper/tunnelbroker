@@ -43,7 +43,7 @@ func main() {
 	h := db.Init(dbUrl)
 
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://127.0.0.1:8080", "http://127.0.0.1:8000"}
+	config.AllowOrigins = []string{"http://127.0.0.1:8080", "http://127.0.0.1:8000", "http://127.0.0.1:3000", "http://localhost:3000"}
 	config.AllowHeaders = []string{"content-type", "content-lenght", "authorization", "origin", "Set-Cookie"}
 	config.AllowMethods = []string{"GET", "POST", "OPTIONS"}
 	config.AllowCredentials = true
