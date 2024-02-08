@@ -20,8 +20,6 @@ func NotRequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err == nil {
-		// c.AbortWithStatusJSON(http.StatusTemporaryRedirect, gin.H{"message": "already registered"})
-		// c.Abort()
 		fmt.Printf("error, already authorized %s\n", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/user/")
 		c.Abort()
@@ -70,7 +68,6 @@ func RequireAuth(c *gin.Context) {
 	})
 
 	if err != nil || token == nil {
-		// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
 		c.Abort()
 		return
@@ -93,11 +90,8 @@ func RequireAuth(c *gin.Context) {
 			c.Redirect(http.StatusTemporaryRedirect, "/login")
 			c.Abort()
 		}
-
-		// Attach the request
 		c.Set("user", user)
 
-		//Continue
 		c.Next()
 	} else {
 		fmt.Printf("error, not authorized %s\n", err)

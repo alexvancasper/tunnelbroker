@@ -55,8 +55,8 @@ func main() {
 	r.Use(sessions.Sessions("session", store))
 	r.Use(csrf.Middleware(option))
 
-	// r.StaticFS("/static", http.Dir("/pkg/webview/static"))
-	r.Static("/static", "./pkg/webview/static")
+	r.StaticFS("/static", http.Dir("./pkg/webview/static"))
+	// r.Static("/static", "/pkg/webview/static")
 	r.LoadHTMLGlob("./pkg/webview/templates/*")
 	r.GET("/", webview.Index)
 	r.GET("/login", webview.Login)
