@@ -30,6 +30,7 @@
 <p class="h1 mt-5">{{ .Title }}</p>
     <br>
 <form id="useraddform" method="POST" action="/signup">
+    <input type="hidden" name="csrf_token" value="{{ .Token }}">
     <div class="form-group w-25" >
       <label for="exampleInputEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -41,9 +42,10 @@
     <div class="form-group  w-25">
         <label for="exampleInputPassword1">Repeat Password</label>
         <input type="password" class="form-control" id="exampleInputPassword1" name="repPassword" placeholder="Repeat Password">
+        
     </div>    
     {{ if .Error }}
-    <p>error: {{ .Error }}</p>
+    <p>Error: {{ .Error }}</p>
     {{ end}}
     <div id="message"></div>
     <button type="submit" class="btn btn-success">Create</button> 
@@ -57,21 +59,25 @@
         const email = form.querySelector('input[name="Email"]').value;
         const password = form.querySelector('input[name="Password"]').value;
         const rpassword = form.querySelector('input[name="repPassword"]').value;
+        const token = form.querySelector('input[name="csrf_token"]').value;
         const message = document.querySelector('#message'); 
         if (password!==rpassword) {
             message.innerHTML="Passwords do not match";
             return;
         }
-        
         data = {
             login : email,
             password : password,
         };
+        console.log(data);
         $.ajax({
         url: "/signup",
         method: "POST",
         data: JSON.stringify(data),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
         success : function () {
             message.innerHTML="User is created. Redirecting to login page";
             setTimeout(function() {
@@ -88,7 +94,8 @@
 
 {{ define "addtunnel" }}
 <p class="text-monospace"> Add new tunnel  </p>
-<form id="addtunnel">            
+<form id="addtunnel">
+    <input type="hidden" name="csrf_token" value="{{ .Token }}">         
 <table border="1">
     <tr>
         <td>Name</td>
@@ -110,6 +117,7 @@
 addtunnel.onsubmit = async (e) => {
     e.preventDefault();
     var form = document.querySelector("#addtunnel");
+    const token = form.querySelector('input[name="csrf_token"]').value;
     data = {
         TunnelName : form.querySelector('input[name="TunnelName"]').value,
         IPv4Remote : form.querySelector('input[name="IPv4Remote"]').value,
@@ -118,7 +126,10 @@ addtunnel.onsubmit = async (e) => {
     url: "/tunnel/{{ .User.API }}/",
     method: "POST",
     data: JSON.stringify(data),
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
     success : function () {
       window.location.href = "/user/";
     }
@@ -129,7 +140,8 @@ addtunnel.onsubmit = async (e) => {
 
 {{ define "addtunnel2" }}
 <p class="text-monospace"> Add new tunnel  </p>
-<form id="addtunnel" class="text-monospace">            
+<form id="addtunnel" class="text-monospace">
+    <input type="hidden" name="csrf_token" value="{{ .Token }}">
     <div class="form-group row w-50">
         <label for="TunnelName" class="col-sm-3 col-form-label ">Tunnel name</label>
         <div class="col-sm-5">
@@ -149,6 +161,7 @@ addtunnel.onsubmit = async (e) => {
 addtunnel.onsubmit = async (e) => {
     e.preventDefault();
     var form = document.querySelector("#addtunnel");
+    const token = form.querySelector('input[name="csrf_token"]').value;
     data = {
         TunnelName : form.querySelector('input[name="TunnelName"]').value,
         IPv4Remote : form.querySelector('input[name="IPv4Remote"]').value,
@@ -157,7 +170,10 @@ addtunnel.onsubmit = async (e) => {
     url: "/tunnel/{{ .User.API }}/",
     method: "POST",
     data: JSON.stringify(data),
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
     success : function () {
       window.location.href = "/user/";
     }
@@ -178,6 +194,8 @@ window.onload = getPublicIP()
 {{ define "ListTunnels" }}
 
     {{ if .User.Tunnels }}
+    <input type="hidden" name="csrf_token" value="{{ .Token }}">
+
         {{range $index, $element := .User.Tunnels }}
         
         <table border="1" class="table table-bordered mt-5 w-50 text-monospace">
@@ -225,10 +243,16 @@ window.onload = getPublicIP()
         <p class="text-monospace">There is no configured tunnel</p>
     {{ end }}
 <script>
+    const token = document.querySelector('input[name="csrf_token"]').value;
+
     $(".control-action").on("click", function(e)  {
   $.ajax({
     url: "/tunnel/{{ .User.API }}/"+this.id,
     method: "DELETE",
+    headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
     success : function () {
       window.location.href = "/user/";
     }
@@ -238,36 +262,12 @@ window.onload = getPublicIP()
 {{ end }}
 
 
-{{ define "LoginForm" }}
-
-    <p>{{ .Title }}</p>
-    <br>
-    <form id="loginform" method="POST" action="/login">
-    <table>
-        <tr>
-            <td>Login</td>
-            <td><input type="text" id="email" name="Email" placeholder="user@example.com"/></td>
-        </tr>
-        <tr>
-            <td>Password</td>
-            <td><input type="password" id="password" name="Password" placeholder="password"/></td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center"> 
-                <button type="submit">Login</button> 
-                </td>
-        </tr>
-    </table>    
-    </form>
-    <a href="/signup"><button>Register</button></a> 
-
-{{ end }}
-
-
 {{ define "LoginForm2" }}
 <p class="h1 mt-5">{{ .Title }}</p>
     <br>
 <form id="loginform" method="POST" action="/login">
+    <input type="hidden" name="csrf_token" value="{{ .Token }}">
+
     <div class="form-group w-25" >
       <label for="exampleInputEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -277,7 +277,7 @@ window.onload = getPublicIP()
       <input type="password" class="form-control" id="exampleInputPassword1" name="Password" placeholder="Password">
     </div>
     {{ if .Error }}
-    <p>error: {{ .Error }}</p>
+    <p>Error: {{ .Error }}</p>
     {{ end}}
     <div id="message"></div>
     <button type="submit" class="btn btn-success">Login</button> 
@@ -290,6 +290,7 @@ window.onload = getPublicIP()
         const email = form.querySelector('input[name="Email"]').value;
         const pass = form.querySelector('input[name="Password"]').value;
         const message = document.querySelector('#message'); 
+        const token = form.querySelector('input[name="csrf_token"]').value;
 
         if (email.length <=3  ||  pass.length <=3) {
             message.innerHTML="Check the email and password value"
@@ -303,7 +304,10 @@ window.onload = getPublicIP()
         url: "/login",
         method: "POST",
         data: JSON.stringify(data),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token,
+        },
         success : function () {
           window.location.href = "/user/";
         }

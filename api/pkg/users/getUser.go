@@ -5,6 +5,7 @@ import (
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
 	"github.com/gin-gonic/gin"
+	csrf "github.com/utrack/gin-csrf"
 )
 
 func (h handler) GetUser(c *gin.Context) {
@@ -23,6 +24,7 @@ func (h handler) GetUser(c *gin.Context) {
 
 	c.HTML(http.StatusOK, "user.html", gin.H{
 		"Title": "User room",
+		"Token": csrf.GetToken(c),
 		"User":  user,
 	})
 	// c.JSON(http.StatusOK, &user)

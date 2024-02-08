@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
@@ -10,8 +11,11 @@ import (
 	"github.com/alexvancasper/TunnelBroker/web/pkg/users"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/webview"
 	formatter "github.com/fabienm/go-logrus-formatters"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	csrf "github.com/utrack/gin-csrf"
 )
 
 func main() {
@@ -39,6 +43,18 @@ func main() {
 	r := gin.Default()
 	h := db.Init(dbUrl)
 
+	store := cookie.NewStore([]byte("secret"))
+	option := csrf.Options{
+		Secret: "secret123",
+		ErrorFunc: func(c *gin.Context) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "CSRF token mismatch"})
+			c.Abort()
+		},
+	}
+
+	r.Use(sessions.Sessions("session", store))
+	r.Use(csrf.Middleware(option))
+
 	// r.StaticFS("/static", http.Dir("/pkg/webview/static"))
 	r.Static("/static", "./pkg/webview/static")
 	r.LoadHTMLGlob("./pkg/webview/templates/*")
@@ -55,4 +71,8 @@ func main() {
 	tunnels.RegisterRoutes(r, h, MyLogger)
 
 	r.Run(port)
+}
+
+func csrfCheck() {
+
 }

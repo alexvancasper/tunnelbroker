@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
+	csrf "github.com/utrack/gin-csrf"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
 
@@ -70,6 +71,7 @@ func Signup(c *gin.Context) {
 	// c.JSON(http.StatusCreated, gin.H{"mesage": "User created"})
 	c.HTML(http.StatusCreated, "adduser.html", gin.H{
 		"Title": title,
+		"Token": csrf.GetToken(c),
 		"Error": "User created. Redirect to login page",
 	})
 	// c.Redirect(http.StatusCreated, "/login")

@@ -55,10 +55,10 @@ services:
 # docker run --name ipam-tb -p 1034:1034 -e "PORT=1034" -e "DB_URL=postgres://postgres:postgresql@10.90.3.12:5432/tunnelbroker?sslmode=disable" -d ipam:v1
 
 # For running api -
-# export IPv4LOCALADDR=1.1.1.1
-# export IPAM=localhost:1034
-# export PORT=:8080
-# export DB_URL=postgres://postgres:postgresql@localhost:5432/tunnelbroker?sslmode=disable
+#  export IPv4LOCALADDR=1.1.1.1
+#  export IPAM=localhost:1034
+#  export PORT=:8080
+#  export DB_URL=postgres://postgres:postgresql@localhost:5432/tunnelbroker?sslmode=disable
 # then 
 # ╭─root@devvm ~/go/src/TunnelBroker/api ‹frontend+backend●› 
 # ╰─# go run cmd/main.go      
