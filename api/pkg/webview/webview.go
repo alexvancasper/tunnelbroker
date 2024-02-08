@@ -12,6 +12,7 @@ func Login(c *gin.Context) {
 		"Title": "TunnelBroker 6in4",
 		"Token": csrf.GetToken(c),
 	})
+
 }
 
 func Register(c *gin.Context) {

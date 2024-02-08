@@ -40,12 +40,9 @@
     </div>
     <div class="form-group  w-25">
         <label for="exampleInputPassword1">Repeat Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" name="repPassword" placeholder="Repeat Password">
+        <input type="password" class="form-control" id="exampleInputPassword2" name="repPassword" placeholder="Repeat Password">
         
     </div>    
-    {{ if .Error }}
-    <p>Error: {{ .Error }}</p>
-    {{ end}}
     <div id="message"></div>
     <button type="submit" class="btn btn-success">Create</button> 
   </form>
@@ -68,21 +65,24 @@
             login : email,
             password : password,
         };
-        console.log(data);
         $.ajax({
         url: "/signup",
         method: "POST",
+        cache: false,
         data: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': token,
         },
         success : function () {
-            message.innerHTML="User is created. Redirecting to login page";
+            message.innerHTML="User is created. Redirecting to login page in 5 seconds";
             setTimeout(function() {
                 window.location.href = "/login/";
             }, 5000);
-        }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+            message.innerHTML= XMLHttpRequest.responseJSON.message
+        } 
       });
     }
     
@@ -124,6 +124,7 @@ addtunnel.onsubmit = async (e) => {
     $.ajax({
     url: "/tunnel/{{ .User.API }}/",
     method: "POST",
+    cache: false,
     data: JSON.stringify(data),
     headers: {
             'Content-Type': 'application/json',
@@ -168,6 +169,7 @@ addtunnel.onsubmit = async (e) => {
     $.ajax({
     url: "/tunnel/{{ .User.API }}/",
     method: "POST",
+    cache: false,
     data: JSON.stringify(data),
     headers: {
             'Content-Type': 'application/json',
@@ -193,70 +195,68 @@ window.onload = getPublicIP()
 
     {{ if .User.Tunnels }}
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
-
         {{range $index, $element := .User.Tunnels }}
-        
-        <table border="1" class="table table-bordered mt-5 w-50 text-monospace">
-        <tr>
-            <th> ID </th>
-            <td> {{ $element.ID }}  </td>
-        </tr>
-        <tr>
-            <th> Tunnel Name </th>
-            <td> {{ $element.TunnelName }}  </td>
-        </tr>
-        <tr>
-            <th> IPv4 Client address</th>
-            <td> {{ $element.IPv4Remote }}  </td>
-        </tr>
-        <tr>
-            <th> IPv4 Server address </th>
-            <td> {{ $element.IPv4Local }}  </td>
-        </tr>
-        <tr>
-            <th> IPv6 client address </th>
-            <td> {{ $element.IPv6ClientEndpoint }}  </td>
-        </tr>    
-        <tr>
-            <th> IPv6 server address </th>
-            <td> {{ $element.IPv6ServerEndpoint }}  </td>
-        </tr>    
+            <table border="1" class="table table-bordered mt-5 w-50 text-monospace">
+            <tr>
+                <th> ID </th>
+                <td> {{ $element.ID }}  </td>
+            </tr>
+            <tr>
+                <th> Tunnel Name </th>
+                <td> {{ $element.TunnelName }}  </td>
+            </tr>
+            <tr>
+                <th> IPv4 Client address</th>
+                <td> {{ $element.IPv4Remote }}  </td>
+            </tr>
+            <tr>
+                <th> IPv4 Server address </th>
+                <td> {{ $element.IPv4Local }}  </td>
+            </tr>
+            <tr>
+                <th> IPv6 client address </th>
+                <td> {{ $element.IPv6ClientEndpoint }}  </td>
+            </tr>    
+            <tr>
+                <th> IPv6 server address </th>
+                <td> {{ $element.IPv6ServerEndpoint }}  </td>
+            </tr>    
 
-        <tr>
-            <th> IPv6 PD prefix </th>
-            <td> {{ $element.PD }}  </td>
-        </tr>    
-        <tr>
-            <th> Already configured </th>
-            <td> {{ $element.Configured }}  </td>
-        </tr>
-        <tr>
-            <th> Action </th>
-            <td> <button class="control-action btn btn-danger" id="{{ $element.ID }}">Delete</button>  </td>
-        </tr>
-        </table>      
-        <br>        
+            <tr>
+                <th> IPv6 PD prefix </th>
+                <td> {{ $element.PD }}  </td>
+            </tr>    
+            <tr>
+                <th> Already configured </th>
+                <td> {{ $element.Configured }}  </td>
+            </tr>
+            <tr>
+                <th> Action </th>
+                <td>  <button class="control-action btn btn-danger" id="{{ $element.ID }}">Delete</button>  </td>
+            </tr>
+            </table>      
+            <br>        
         {{end}}
+            <script>
+                const token = document.querySelector('input[name="csrf_token"]').value;
+                $(".control-action").on("click", function(e)  {
+            $.ajax({
+                url: "/tunnel/{{ .User.API }}/"+this.id,
+                method: "DELETE",
+                cache: false,
+                headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                    },
+                success : function () {
+                window.location.href = "/user/";
+                }
+            });
+            });
+            </script>
     {{ else }}
         <p class="text-monospace">There is no configured tunnel</p>
     {{ end }}
-<script>
-    const token = document.querySelector('input[name="csrf_token"]').value;
-
-    $(".control-action").on("click", function(e)  {
-  $.ajax({
-    url: "/tunnel/{{ .User.API }}/"+this.id,
-    method: "DELETE",
-    headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
-        },
-    success : function () {
-      window.location.href = "/user/";
-    }
-  });
-});
-</script>
 {{ end }}
 
 
@@ -265,7 +265,6 @@ window.onload = getPublicIP()
     <br>
 <form id="loginform" method="POST" action="/login">
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
-
     <div class="form-group w-25" >
       <label for="exampleInputEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
@@ -301,14 +300,18 @@ window.onload = getPublicIP()
         $.ajax({
         url: "/login",
         method: "POST",
+        cache: false,
         data: JSON.stringify(data),
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token,
+            'X-Csrf-Token': token,
         },
-        success : function () {
+        success : function (XMLHttpRequest, textStatus, errorThrown) {
           window.location.href = "/user/";
-        }
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+            message.innerHTML= XMLHttpRequest.responseJSON.message
+        } 
       });
     };
     </script>

@@ -20,7 +20,7 @@ func NotRequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err == nil {
-		fmt.Printf("error, already authorized %s\n", err)
+		fmt.Printf("error, already authorized\n")
 		c.Redirect(http.StatusTemporaryRedirect, "/user/")
 		c.Abort()
 		return
@@ -37,7 +37,7 @@ func NotRequireAuth(c *gin.Context) {
 		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err == nil || token != nil {
-		fmt.Printf("error, already authorized %s\n", err)
+		fmt.Printf("error, already authorized\n")
 		c.Redirect(http.StatusTemporaryRedirect, "/user/")
 		c.Abort()
 		return
@@ -51,7 +51,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		fmt.Printf("error, not authorized %s\n", err)
+		fmt.Printf("error, not authorized %v\n", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
 		c.Abort()
 	}
@@ -76,7 +76,7 @@ func RequireAuth(c *gin.Context) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Chec k the expiry date
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			fmt.Printf("error, not authorized %s\n", err)
+			fmt.Printf("error, not authorized %s\n", "token issue")
 			c.Redirect(http.StatusTemporaryRedirect, "/login")
 			c.Abort()
 		}
@@ -86,7 +86,7 @@ func RequireAuth(c *gin.Context) {
 		db.DB.First(&user, claims["sub"])
 
 		if user.ID == 0 {
-			fmt.Printf("error, not authorized %s\n", err)
+			fmt.Printf("error, not authorized\n")
 			c.Redirect(http.StatusTemporaryRedirect, "/login")
 			c.Abort()
 		}
@@ -94,7 +94,7 @@ func RequireAuth(c *gin.Context) {
 
 		c.Next()
 	} else {
-		fmt.Printf("error, not authorized %s\n", err)
+		fmt.Printf("error, not authorized\n")
 		c.Redirect(http.StatusTemporaryRedirect, "/login")
 		c.Abort()
 	}

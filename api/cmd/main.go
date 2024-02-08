@@ -50,23 +50,19 @@ func main() {
 	r.Use(sessions.Sessions("session", store))
 	r.Use(csrf.Middleware(option))
 
-	r.StaticFS("/static", http.Dir("/pkg/webview/static"))
-	r.LoadHTMLGlob("/pkg/webview/templates/*")
+	r.StaticFS("/static", http.Dir("./pkg/webview/static"))
+	r.LoadHTMLGlob("./pkg/webview/templates/*")
 	r.GET("/", webview.Index)
-	r.GET("/login", webview.Login)
+	r.GET("/login", middleware.NotRequireAuth, webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
 	r.GET("/ip", webview.IP)
 
-	r.POST("/signup", controllers.Signup)
-	r.POST("/login", controllers.Login)
+	r.POST("/signup", controllers.PostSignup)
+	r.POST("/login", controllers.PostLogin)
 
 	users.RegisterRoutes(r, h, MyLogger)
 	tunnels.RegisterRoutes(r, h, MyLogger)
 
 	r.Run(port)
-}
-
-func csrfCheck() {
-
 }

@@ -28,7 +28,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 }
 
 func getIDfromToken(c *gin.Context) (uint, error) {
-
 	user, exists := c.Get("user")
 	if !exists {
 		return 0, fmt.Errorf("user not found")

@@ -24,8 +24,24 @@
     
 
     <center>
-    <input type="button" onclick="location.href='/logout';"   class="btn btn-danger text-monospace" value="Logout" />
+    <input type="button" onclick="Logout();"   class="btn btn-danger text-monospace" value="Logout" />
     </center>
-    
+    <script>
+        function Logout() {
+            $.ajax({
+            url: "/logout",
+            method: "GET",
+            cache: false,
+            success : function (XMLHttpRequest, textStatus, errorThrown) {
+                window.location.href = "/login/";
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                // message.innerHTML= XMLHttpRequest.responseJSON.message
+                console.log(XMLHttpRequest)
+            } 
+        });            
+        }
+        
+    </script>
 {{ template "footer" . }}
 
