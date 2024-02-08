@@ -17,7 +17,7 @@ import (
 )
 
 func Signup(c *gin.Context) {
-
+	title := "TunnelBroker 6in4 - Register new user"
 	// Get the email/pass off req Body
 	var body struct {
 		Email    string `json:"login"`
@@ -25,8 +25,12 @@ func Signup(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Failed to read body",
+		// })
+		c.HTML(http.StatusBadRequest, "adduser.html", gin.H{
+			"Title": title,
+			"Error": "Failed to read request",
 		})
 
 		return
@@ -35,8 +39,12 @@ func Signup(c *gin.Context) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to hash password.",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Failed to hash password.",
+		// })
+		c.HTML(http.StatusBadRequest, "adduser.html", gin.H{
+			"Title": title,
+			"Error": "Failed to read data",
 		})
 		return
 	}
@@ -47,18 +55,28 @@ func Signup(c *gin.Context) {
 	result := db.DB.Create(&user)
 
 	if result.Error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create user.",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Failed to create user.",
+		// })
+		c.HTML(http.StatusBadRequest, "adduser.html", gin.H{
+			"Title": title,
+			"Error": "Failed to read user data",
 		})
 		c.Abort()
 		return
 	}
 
 	// Respond
-	c.JSON(http.StatusCreated, gin.H{"mesage": "User created"})
+	// c.JSON(http.StatusCreated, gin.H{"mesage": "User created"})
+	c.HTML(http.StatusCreated, "adduser.html", gin.H{
+		"Title": title,
+		"Error": "User created. Redirect to login page",
+	})
+	// c.Redirect(http.StatusCreated, "/login")
 }
 
 func Login(c *gin.Context) {
+	title := "TunnelBroker 6in4"
 	// Get email & pass off req body
 	var body struct {
 		Email    string `json:"login"`
@@ -66,10 +84,13 @@ func Login(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to read body",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Failed to read body",
+		// })
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"Title": title,
+			"Error": "Failed to read request",
 		})
-
 		return
 	}
 	// Look up for requested user
@@ -78,8 +99,12 @@ func Login(c *gin.Context) {
 	db.DB.First(&user, "login = ?", body.Email)
 
 	if user.ID == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Invalid email or password",
+		// })
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"Title": title,
+			"Error": "Invalid email or password",
 		})
 		return
 	}
@@ -88,8 +113,12 @@ func Login(c *gin.Context) {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Invalid email or password",
+		// })
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"Title": title,
+			"Error": "Invalid email or password",
 		})
 		return
 	}
@@ -104,17 +133,22 @@ func Login(c *gin.Context) {
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create token",
+		// c.JSON(http.StatusBadRequest, gin.H{
+		// 	"error": "Failed to create token",
+		// })
+		c.HTML(http.StatusOK, "login.html", gin.H{
+			"Title": title,
+			"Error": "Failed to create token",
 		})
 		return
 	}
 
 	// Respond
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", false, false)
+	c.SetCookie("Authorization", tokenString, 3600*24*1, "", "", false, false)
 
 	c.JSON(http.StatusOK, gin.H{"message": "logged in successfully"})
+	// c.Redirect(http.StatusTemporaryRedirect, "/user/")
 }
 
 func Logout(c *gin.Context) {
@@ -122,9 +156,9 @@ func Logout(c *gin.Context) {
 	if err != nil || len(tokenString) <= 100 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "cookie is not found"})
 	}
-	c.SetCookie("Authorization", tokenString, 1, "", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"message": "user logout"})
-	// c.Redirect(http.StatusFound, "/login")
+	c.SetCookie("Authorization", tokenString, 1, "", "", false, false)
+	// c.JSON(http.StatusOK, gin.H{"message": "user logout"})
+	c.Redirect(http.StatusTemporaryRedirect, "/login")
 }
 
 func Validate(c *gin.Context) {

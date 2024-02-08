@@ -8,13 +8,13 @@ import (
 
 func Login(c *gin.Context) {
 	c.HTML(http.StatusOK, "login.html", gin.H{
-		"Title": "Tunnel Broker 6in4",
+		"Title": "TunnelBroker 6in4",
 	})
 }
 
 func Register(c *gin.Context) {
 	c.HTML(http.StatusOK, "adduser.html", gin.H{
-		"Title": "Tunnel Broker register",
+		"Title": "TunnelBroker register",
 	})
 }
 

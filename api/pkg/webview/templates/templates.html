@@ -7,9 +7,11 @@
     <title>
         {{ .Title }}
     </title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> -->
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script> -->
+    <link rel="stylesheet" href="/static/bootstrap.min.css"/>
+    <script src="/static/jquery.min.js"></script>
     <link rel="stylesheet" href="/static/style.css">  
 </head>
 <body>
@@ -24,22 +26,46 @@
 
 
 {{ define "useraddform" }}
-<p>{{ .Title }}</p>
-<br>
-<form id="useraddform">
-Email: <input type="text" id="email" name="Email" placeholder="user@example.com"/><br>
-Password: <input type="password" id="password" name="Password" placeholder="secret password"/><br>
-Repeat Password <input type="password" id="repeatpassword" name="RepeatPassword" placeholder="repeat secret password"/><br>
-    <input type="submit" value="Create">
-</form>
+
+<p class="h1 mt-5">{{ .Title }}</p>
+    <br>
+<form id="useraddform" method="POST" action="/signup">
+    <div class="form-group w-25" >
+      <label for="exampleInputEmail1">Email address</label>
+      <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
+    </div>
+    <div class="form-group  w-25">
+      <label for="exampleInputPassword1">Password</label>
+      <input type="password" class="form-control" id="exampleInputPassword1" name="Password" placeholder="Password">
+    </div>
+    <div class="form-group  w-25">
+        <label for="exampleInputPassword1">Repeat Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" name="repPassword" placeholder="Repeat Password">
+    </div>    
+    {{ if .Error }}
+    <p>error: {{ .Error }}</p>
+    {{ end}}
+    <div id="message"></div>
+    <button type="submit" class="btn btn-success">Create</button> 
+  </form>
+  
 
 <script>
     useraddform.onsubmit = async (e) => {
         e.preventDefault();
         var form = document.querySelector("#useraddform");
+        const email = form.querySelector('input[name="Email"]').value;
+        const password = form.querySelector('input[name="Password"]').value;
+        const rpassword = form.querySelector('input[name="repPassword"]').value;
+        const message = document.querySelector('#message'); 
+        if (password!==rpassword) {
+            message.innerHTML="Passwords do not match";
+            return;
+        }
+        
         data = {
-            login : form.querySelector('input[name="Email"]').value,
-            password : form.querySelector('input[name="Password"]').value,
+            login : email,
+            password : password,
         };
         $.ajax({
         url: "/signup",
@@ -47,7 +73,10 @@ Repeat Password <input type="password" id="repeatpassword" name="RepeatPassword"
         data: JSON.stringify(data),
         headers: {'Content-Type': 'application/json'},
         success : function () {
-          window.location.href = "/login/";
+            message.innerHTML="User is created. Redirecting to login page";
+            setTimeout(function() {
+                window.location.href = "/login/";
+            }, 5000);
         }
       });
     }
@@ -247,8 +276,38 @@ window.onload = getPublicIP()
       <label for="exampleInputPassword1">Password</label>
       <input type="password" class="form-control" id="exampleInputPassword1" name="Password" placeholder="Password">
     </div>
+    {{ if .Error }}
+    <p>error: {{ .Error }}</p>
+    {{ end}}
+    <div id="message"></div>
     <button type="submit" class="btn btn-success">Login</button> 
     <input type="button" onclick="location.href='/signup';"   class="btn btn-warning" value="Register" />
   </form>
-  
+  <script>
+    loginform.onsubmit = async (e) => {
+        e.preventDefault();
+        var form = document.querySelector("#loginform");
+        const email = form.querySelector('input[name="Email"]').value;
+        const pass = form.querySelector('input[name="Password"]').value;
+        const message = document.querySelector('#message'); 
+
+        if (email.length <=3  ||  pass.length <=3) {
+            message.innerHTML="Check the email and password value"
+            return 
+        }
+        data = {
+            login : email,
+            password : pass,
+            };
+        $.ajax({
+        url: "/login",
+        method: "POST",
+        data: JSON.stringify(data),
+        headers: {'Content-Type': 'application/json'},
+        success : function () {
+          window.location.href = "/user/";
+        }
+      });
+    };
+    </script>
 {{ end }}

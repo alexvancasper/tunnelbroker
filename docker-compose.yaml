@@ -22,7 +22,7 @@ services:
       - IPv4LOCALADDR=1.1.1.1
       - IPAM=ipam:1034
       - PORT=:8080
-      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+      - DB_URL=postgres://postgres:postgresql@localhost:5432/tunnelbroker?sslmode=disable
   ipam:
     build:
       context: ipam
@@ -32,7 +32,7 @@ services:
       - 1034:1034
     environment:
       - PORT=1034
-      - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+      - DB_URL=postgres://postgres:postgresql@localhost:5432/tunnelbroker?sslmode=disable
   postgresdb:
     image: postgres
     tty: true
@@ -50,3 +50,15 @@ services:
   #     - RABBITMQ_DEFAULT_VHOST=my_vhost
 
 # $ docker run -d --hostname my-rabbit --name some-rabbit -e RABBITMQ_DEFAULT_USER=user -e RABBITMQ_DEFAULT_PASS=password rabbitmq:3-management      
+
+
+# docker run --name ipam-tb -p 1034:1034 -e "PORT=1034" -e "DB_URL=postgres://postgres:postgresql@10.90.3.12:5432/tunnelbroker?sslmode=disable" -d ipam:v1
+
+# For running api -
+# export IPv4LOCALADDR=1.1.1.1
+# export IPAM=localhost:1034
+# export PORT=:8080
+# export DB_URL=postgres://postgres:postgresql@localhost:5432/tunnelbroker?sslmode=disable
+# then 
+# ╭─root@devvm ~/go/src/TunnelBroker/api ‹frontend+backend●› 
+# ╰─# go run cmd/main.go      
