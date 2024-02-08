@@ -24,3 +24,8 @@ func Register(c *gin.Context) {
 func Index(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, "/login")
 }
+
+func IP(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"origin": c.RemoteIP()})
+	c.Abort()
+}

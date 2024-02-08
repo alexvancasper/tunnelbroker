@@ -20,7 +20,10 @@ func NotRequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err == nil {
-		c.AbortWithStatusJSON(http.StatusTemporaryRedirect, gin.H{"message": "already registered"})
+		// c.AbortWithStatusJSON(http.StatusTemporaryRedirect, gin.H{"message": "already registered"})
+		// c.Abort()
+		fmt.Printf("error, already authorized %s\n", err)
+		c.Redirect(http.StatusTemporaryRedirect, "/user/")
 		c.Abort()
 		return
 	}
@@ -36,7 +39,8 @@ func NotRequireAuth(c *gin.Context) {
 		return []byte(os.Getenv("SECRET")), nil
 	})
 	if err == nil || token != nil {
-		c.AbortWithStatusJSON(http.StatusTemporaryRedirect, gin.H{"message": "already registered"})
+		fmt.Printf("error, already authorized %s\n", err)
+		c.Redirect(http.StatusTemporaryRedirect, "/user/")
 		c.Abort()
 		return
 	}
@@ -49,7 +53,9 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		fmt.Printf("error, not authorized %s\n", err)
+		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.Abort()
 	}
 
 	// Decode/validate it
@@ -62,8 +68,10 @@ func RequireAuth(c *gin.Context) {
 		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
 		return []byte(os.Getenv("SECRET")), nil
 	})
+
 	if err != nil || token == nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		// c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		c.Redirect(http.StatusTemporaryRedirect, "/login")
 		c.Abort()
 		return
 	}
@@ -71,7 +79,9 @@ func RequireAuth(c *gin.Context) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Chec k the expiry date
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			fmt.Printf("error, not authorized %s\n", err)
+			c.Redirect(http.StatusTemporaryRedirect, "/login")
+			c.Abort()
 		}
 
 		// Find the user with token Subject
@@ -79,7 +89,9 @@ func RequireAuth(c *gin.Context) {
 		db.DB.First(&user, claims["sub"])
 
 		if user.ID == 0 {
-			c.AbortWithStatus(http.StatusUnauthorized)
+			fmt.Printf("error, not authorized %s\n", err)
+			c.Redirect(http.StatusTemporaryRedirect, "/login")
+			c.Abort()
 		}
 
 		// Attach the request
@@ -88,6 +100,8 @@ func RequireAuth(c *gin.Context) {
 		//Continue
 		c.Next()
 	} else {
-		c.AbortWithStatus(http.StatusUnauthorized)
+		fmt.Printf("error, not authorized %s\n", err)
+		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.Abort()
 	}
 }

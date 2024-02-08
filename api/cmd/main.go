@@ -62,6 +62,7 @@ func main() {
 	r.GET("/login", webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
+	r.GET("/ip", webview.IP)
 	// r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 
 	r.POST("/signup", controllers.Signup)

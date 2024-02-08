@@ -184,7 +184,6 @@ function getPublicIP() {
     .then(response => response.json())
     .then(data => {
         IPv4Remote.value = data.origin
-      console.log(data.origin);
     });
 }
 window.onload = getPublicIP()
