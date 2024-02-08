@@ -32,20 +32,15 @@ func main() {
 	}
 	MyLogger.SetLevel(loglevel)
 
-	// viper.SetConfigFile("./pkg/common/envs/.env")
-	// viper.ReadInConfig()
-
-	// port := viper.Get("PORT").(string)
-	// dbUrl := viper.Get("DB_URL").(string)
 	port := os.Getenv("PORT")
 	dbUrl := os.Getenv("DB_URL")
 
 	r := gin.Default()
 	h := db.Init(dbUrl)
 
-	store := cookie.NewStore([]byte("secret"))
+	store := cookie.NewStore([]byte(os.Getenv("COOKIEKEY1")))
 	option := csrf.Options{
-		Secret: "secret123",
+		Secret: os.Getenv("COOKIEKEY2"),
 		ErrorFunc: func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "CSRF token mismatch"})
 			c.Abort()
@@ -55,15 +50,13 @@ func main() {
 	r.Use(sessions.Sessions("session", store))
 	r.Use(csrf.Middleware(option))
 
-	r.StaticFS("/static", http.Dir("./pkg/webview/static"))
-	// r.Static("/static", "/pkg/webview/static")
-	r.LoadHTMLGlob("./pkg/webview/templates/*")
+	r.StaticFS("/static", http.Dir("/pkg/webview/static"))
+	r.LoadHTMLGlob("/pkg/webview/templates/*")
 	r.GET("/", webview.Index)
 	r.GET("/login", webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
 	r.GET("/ip", webview.IP)
-	// r.GET("/validate", middleware.RequireAuth, controllers.Validate)
 
 	r.POST("/signup", controllers.Signup)
 	r.POST("/login", controllers.Login)

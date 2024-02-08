@@ -27,5 +27,4 @@ func (h handler) GetUser(c *gin.Context) {
 		"Token": csrf.GetToken(c),
 		"User":  user,
 	})
-	// c.JSON(http.StatusOK, &user)
 }

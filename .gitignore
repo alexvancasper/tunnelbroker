@@ -1,3 +1,6 @@
 .idea
 readme.txt
 *.bak
+helpme.md
+./img/*
+./executor/*

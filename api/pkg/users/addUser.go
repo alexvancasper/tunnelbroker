@@ -16,8 +16,6 @@ type AddUserRequestBody struct {
 
 func (h handler) AddUser(c *gin.Context) {
 	body := AddUserRequestBody{}
-
-	// получаем тело запроса
 	if err := c.Bind(&body); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
