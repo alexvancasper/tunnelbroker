@@ -142,12 +142,6 @@ addtunnel.onsubmit = async (e) => {
 <p class="text-monospace"> Add new tunnel  </p>
 <form id="addtunnel" class="text-monospace">
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
-    <div class="form-group row w-50">
-        <label for="TunnelName" class="col-sm-3 col-form-label ">Tunnel name</label>
-        <div class="col-sm-5">
-            <input type="text" class="form-control" id="TunnelName" name="TunnelName" placeholder="My tunnel name">
-        </div>
-      </div>
       <div class="form-group row w-50">
         <label for="IPv4Remote" class="col-sm-3 col-form-label">IPv4 client address</label>
         <div class="col-sm-5 mt-3">
@@ -163,7 +157,6 @@ addtunnel.onsubmit = async (e) => {
     var form = document.querySelector("#addtunnel");
     const token = form.querySelector('input[name="csrf_token"]').value;
     data = {
-        TunnelName : form.querySelector('input[name="TunnelName"]').value,
         IPv4Remote : form.querySelector('input[name="IPv4Remote"]').value,
         };
     $.ajax({
@@ -200,10 +193,6 @@ window.onload = getPublicIP()
             <tr>
                 <th> ID </th>
                 <td> {{ $element.ID }}  </td>
-            </tr>
-            <tr>
-                <th> Tunnel Name </th>
-                <td> {{ $element.TunnelName }}  </td>
             </tr>
             <tr>
                 <th> IPv4 Client address</th>

@@ -1,6 +1,8 @@
 package tunnels
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -15,8 +17,6 @@ import (
 type AddTunnelRequestBody struct {
 	// IPv4Remote - client's ipv4 address
 	IPv4Remote string `json:"ipv4remote"`
-	// TunnelName - Name of the tunnel
-	TunnelName string `json:"tunnelname"`
 }
 
 func (h handler) AddTunnel(c *gin.Context) {
@@ -41,7 +41,13 @@ func (h handler) AddTunnel(c *gin.Context) {
 
 	var tunnel models.Tunnel
 
-	tunnel.TunnelName = body.TunnelName
+	if !IsIPv4Public(body.IPv4Remote) {
+		l.WithField("input ipv4 address", body.IPv4Remote).Error("Not able to parse")
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Wrong IPv4 address"})
+		return
+	}
+
+	tunnel.TunnelName = GenerateName(fmt.Sprintf("%d%s", user.ID, body.IPv4Remote))
 	tunnel.IPv4Remote = body.IPv4Remote
 	tunnel.UserID = user.ID
 	tunnel.IPv4Local = getLocalIPv4(h.Logf)
@@ -106,4 +112,11 @@ func getPrefix(prefixlen int, logf *logrus.Logger) string {
 	}
 	json.Unmarshal(resBody, &Prefix)
 	return Prefix.Prefix
+}
+
+func GenerateName(s string) string {
+	h := sha1.New()
+	h.Write([]byte(s))
+	sha1_hash := hex.EncodeToString(h.Sum(nil))
+	return sha1_hash[:5]
 }
