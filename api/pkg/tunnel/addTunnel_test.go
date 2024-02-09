@@ -25,7 +25,7 @@ func TestGenerateName(t *testing.T) {
 
 	for name, testCase := range tests {
 		t.Run(name, func(t *testing.T) {
-			res := GenerateName(testCase.addr)
+			res := generateName(testCase.addr)
 			req.Equal(testCase.want, res)
 		})
 	}
