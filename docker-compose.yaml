@@ -13,7 +13,7 @@ services:
       - IPAM=ipam:1034
       - PORT=:8080
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
-      - BROKER_CONN="amqp://guest:guest@localhost:5672/"
+      - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
       - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
@@ -32,3 +32,12 @@ services:
     environment:
       - POSTGRES_PASSWORD=postgresql
       - POSTGRES_DB=tunnelbroker
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=brokeruser
+      - RABBITMQ_DEFAULT_PASS=brokerpass
+    ports:
+      - 15672:15672
