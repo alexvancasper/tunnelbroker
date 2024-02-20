@@ -2,6 +2,7 @@ package tunnels
 
 import (
 	"fmt"
+	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"net/http"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
@@ -69,12 +70,15 @@ func (h handler) AddTunnel(c *gin.Context) {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	err = h.Msg.PublishMsg(data)
-	if err != nil {
-		l.Errorf("Error of sending tunnel data to server %s", err)
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
+
+	go func() {
+		err = h.Msg.PublishMsg(data, broker.ADD)
+		if err != nil {
+			l.Errorf("Error of sending tunnel data to server %s", err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}()
 
 	l.Debugf("Tunnel data: %+v", tunnel)
 	l.Infof("Tunnel created tunnel_id %d", tunnel.ID)

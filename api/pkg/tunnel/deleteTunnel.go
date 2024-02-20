@@ -2,6 +2,7 @@ package tunnels
 
 import (
 	"fmt"
+	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"io"
 	"net/http"
 	"os"
@@ -35,6 +36,22 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 		return
 	}
 
+	data, err := tunnel.Marshal()
+	if err != nil {
+		l.Errorf("Error of marshalling tunnel data %s", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	go func() {
+		err = h.Msg.PublishMsg(data, broker.DELETE)
+		if err != nil {
+			l.Errorf("Error of sending tunnel data to server %s", err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+			return
+		}
+	}()
+
 	l.Debugf("Tunnel data %+v", tunnel)
 	h.DB.Delete(&tunnel)
 	l.Infof("Tunnel deleted from DB with id %d", tunnel.ID)
@@ -45,6 +62,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 
 	releaseIPv6Prefixes(tunnel.PD, h.Logf)
 	l.Infof("IPv6 PD released %s", tunnel.PD)
+
 	c.Status(http.StatusOK)
 }
 
