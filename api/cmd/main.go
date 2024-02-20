@@ -41,7 +41,7 @@ func main() {
 	// Initialize message broker connection
 	m, err := broker.MsgBrokerInit(os.Getenv("BROKER_CONN"), os.Getenv("QUEUENAME"))
 	if err != nil {
-		MyLogger.Errorf("Message broker error init: %s", err)
+		MyLogger.Fatalf("Message broker error init: %s", err)
 	}
 	defer m.Close()
 
