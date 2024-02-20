@@ -13,6 +13,8 @@ services:
       - IPAM=ipam:1034
       - PORT=:8080
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
+      - BROKER_CONN="amqp://guest:guest@localhost:5672/"
+      - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
   ipam:

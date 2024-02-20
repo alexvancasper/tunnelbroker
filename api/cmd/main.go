@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"net/http"
 	"os"
 
@@ -32,11 +33,17 @@ func main() {
 	}
 	MyLogger.SetLevel(loglevel)
 
+	// Initialize DB connection
 	port := os.Getenv("PORT")
 	dbUrl := os.Getenv("DB_URL")
-
-	r := gin.Default()
 	h := db.Init(dbUrl)
+
+	// Initialize message broker connection
+	m, err := broker.MsgBrokerInit(os.Getenv("BROKER_CONN"), os.Getenv("QUEUENAME"))
+	if err != nil {
+		MyLogger.Errorf("Message broker error init: %s", err)
+	}
+	defer m.Close()
 
 	store := cookie.NewStore([]byte(os.Getenv("COOKIEKEY1")))
 	option := csrf.Options{
@@ -47,6 +54,7 @@ func main() {
 		},
 	}
 
+	r := gin.Default()
 	r.Use(sessions.Sessions("session", store))
 	r.Use(csrf.Middleware(option))
 

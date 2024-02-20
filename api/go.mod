@@ -81,6 +81,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.26.0 // indirect
 	github.com/prometheus/procfs v0.6.0 // indirect
+	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/rookie-ninja/rk-boot v1.4.0 // indirect
 	github.com/rookie-ninja/rk-boot/gin v1.2.22 // indirect
 	github.com/rookie-ninja/rk-common v1.2.3 // indirect
