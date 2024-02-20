@@ -51,17 +51,31 @@ func (h handler) AddTunnel(c *gin.Context) {
 	tunnel.IPv6ClientEndpoint, tunnel.IPv6ServerEndpoint = GetEndpoints(p2pPrefix, h.Logf)
 	tunnel.Configured = false
 
+	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
+		l.Errorf("Not able to find user with provided API (2) key %s", api)
+		c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		return
+	}
+
 	if result := h.DB.Create(&tunnel); result.Error != nil {
 		l.Errorf("Not able to insert tunnel in to DB %s", result.Error)
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
 
-	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
-		l.Errorf("Not able to find user with provided API (2) key %s", api)
-		c.AbortWithError(http.StatusNotFound, apiExist.Error)
+	data, err := tunnel.Marshal()
+	if err != nil {
+		l.Errorf("Error of marshalling tunnel data %s", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	err = h.Msg.PublishMsg(data)
+	if err != nil {
+		l.Errorf("Error of sending tunnel data to server %s", err)
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
 	l.Debugf("Tunnel data: %+v", tunnel)
 	l.Infof("Tunnel created tunnel_id %d", tunnel.ID)
 	c.JSON(http.StatusCreated, gin.H{"message": "tunnel is created"})

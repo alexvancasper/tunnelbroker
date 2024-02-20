@@ -70,7 +70,7 @@ func main() {
 	r.POST("/login", controllers.PostLogin)
 
 	users.RegisterRoutes(r, h, MyLogger)
-	tunnels.RegisterRoutes(r, h, MyLogger)
+	tunnels.RegisterRoutes(r, h, m, MyLogger)
 
 	r.Run(port)
 }

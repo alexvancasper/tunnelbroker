@@ -1,6 +1,9 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"encoding/json"
+	"gorm.io/gorm"
+)
 
 type Tunnel struct {
 	gorm.Model
@@ -12,4 +15,12 @@ type Tunnel struct {
 	IPv4Remote         string `json:"ipv4remote"`
 	IPv4Local          string `json:"ipv4local"`
 	TunnelName         string `json:"tunnelname"`
+}
+
+func (t Tunnel) Marshal() ([]byte, error) {
+	data, err := json.Marshal(t)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
