@@ -3,9 +3,10 @@ package broker
 import (
 	"context"
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 const (
@@ -35,6 +36,59 @@ func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
 		return nil, err
 	}
 	return &msg, nil
+}
+
+func (m *MsgBroker) AddRegisterConsumer() (<-chan amqp.Delivery, error) {
+	msg, err := m.channel.Consume(
+		m.queue[ADD].Name, // queue
+		"",                // consumer
+		true,              // auto-ack
+		false,             // exclusive
+		false,             // no-local
+		false,             // no-wait
+		nil,               // args
+	)
+	if err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
+func (m *MsgBroker) DeleteRegisterConsumer() (<-chan amqp.Delivery, error) {
+	msg, err := m.channel.Consume(
+		m.queue[DELETE].Name, // queue
+		"",                   // consumer
+		true,                 // auto-ack
+		false,                // exclusive
+		false,                // no-local
+		false,                // no-wait
+		nil,                  // args
+	)
+	if err != nil {
+		return nil, err
+	}
+	return msg, nil
+}
+
+func (m *MsgBroker) PublishMsg(data []byte, queueType string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var err error
+	err = m.channel.PublishWithContext(ctx,
+		"",                      // exchange
+		m.queue[queueType].Name, // routing key
+		false,                   // mandatory
+		false,                   // immediate
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        data,
+		})
+	if err != nil {
+		return fmt.Errorf("%s: %s", "Failed to publish a message", err)
+	}
+	log.Printf(" [x] Sent %s\n", data)
+	return nil
 }
 
 func (m *MsgBroker) connect(connStr string) error {
@@ -84,25 +138,9 @@ func (m *MsgBroker) queueDeclare(queueName string) error {
 	return nil
 }
 
-func (m *MsgBroker) PublishMsg(data []byte, queueType string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	var err error
-	err = m.channel.PublishWithContext(ctx,
-		"",                      // exchange
-		m.queue[queueType].Name, // routing key
-		false,                   // mandatory
-		false,                   // immediate
-		amqp.Publishing{
-			ContentType: "application/json",
-			Body:        data,
-		})
-	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to publish a message", err)
-	}
-	log.Printf(" [x] Sent %s\n", data)
-	return nil
+func (m *MsgBroker) Close() {
+	m.channelClose()
+	m.connClose()
 }
 
 func (m *MsgBroker) connClose() {
@@ -110,9 +148,4 @@ func (m *MsgBroker) connClose() {
 }
 func (m *MsgBroker) channelClose() {
 	_ = m.channel.Close()
-}
-
-func (m *MsgBroker) Close() {
-	m.channelClose()
-	m.connClose()
 }

@@ -17,6 +17,14 @@ services:
       - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
+  executor:
+    build:
+      context: executor
+    image: alex129/executor
+    restart: always
+    environment:
+      - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
+      - QUEUENAME=6in4
   ipam:
     build:
       context: ipam
