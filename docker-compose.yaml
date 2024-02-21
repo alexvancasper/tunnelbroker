@@ -17,14 +17,14 @@ services:
       - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
-  agent:
-    build:
-      context: agent
-    image: alex129/agent
-    restart: always
-    environment:
-      - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
-      - QUEUENAME=6in4
+  # agent:
+  #   build:
+  #     context: agent
+  #   image: alex129/agent
+  #   restart: always
+  #   environment:
+  #     - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
+  #     - QUEUENAME=6in4      
   ipam:
     build:
       context: ipam
@@ -48,4 +48,5 @@ services:
       - RABBITMQ_DEFAULT_USER=brokeruser
       - RABBITMQ_DEFAULT_PASS=brokerpass
     ports:
+      - 5672:5672
       - 15672:15672
