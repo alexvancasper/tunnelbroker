@@ -6,7 +6,8 @@ import (
 	"os/signal"
 	"sync"
 
-	"github.com/alexvancasper/TunnelBroker/executor/internal/broker"
+	"github.com/alexvancasper/TunnelBroker/agent/internal/broker"
+	"github.com/alexvancasper/TunnelBroker/agent/internal/doer"
 	formatter "github.com/fabienm/go-logrus-formatters"
 	"github.com/rabbitmq/amqp091-go"
 	"github.com/sirupsen/logrus"
@@ -17,7 +18,7 @@ func main() {
 	//Initialize Logging connections
 	var MyLogger = logrus.New()
 
-	gelfFmt := formatter.NewGelf("executor")
+	gelfFmt := formatter.NewGelf("agent")
 	MyLogger.SetFormatter(gelfFmt)
 	MyLogger.SetOutput(os.Stdout)
 	loglevel, err := logrus.ParseLevel("debug")
@@ -54,6 +55,7 @@ func main() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
 	<-c
+	MyLogger.Info("Graceful shutdown")
 	ctxCancel()
 
 }
@@ -61,15 +63,22 @@ func main() {
 func Listener(ctx context.Context, addMsgs, delMsgs <-chan amqp091.Delivery, log *logrus.Logger, wg *sync.WaitGroup) {
 	defer wg.Done()
 	l := log.WithField("function", "Listener")
+	h := doer.Handler{
+		Log: log,
+	}
 	for {
 		select {
 		case <-ctx.Done():
-			l.Info("Context closed")
+			l.Debug("Context closed")
 			return
 		case addmsg := <-addMsgs:
-			l.Printf("Received from ADD queue a message: %s", addmsg.Body)
+			l.Debugf("Received from ADD queue a message: %s", addmsg.Body)
+			wg.Add(1)
+			go h.AddTunnel(wg, addmsg.Body)
 		case delmsg := <-delMsgs:
-			l.Printf("Received from DELETE queue a message: %s", delmsg.Body)
+			l.Debugf("Received from DELETE queue a message: %s", delmsg.Body)
+			wg.Add(1)
+			go h.DeleteTunnel(wg, delmsg.Body)
 		}
 	}
 

@@ -17,10 +17,10 @@ services:
       - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
-  executor:
+  agent:
     build:
-      context: executor
-    image: alex129/executor
+      context: agent
+    image: alex129/agent
     restart: always
     environment:
       - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
