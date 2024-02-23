@@ -4,31 +4,23 @@ services:
   api:
     build:
       context: api
-    image: alex129/web
+    # image: alex129/web
     restart: always
     ports:
         - "8080:8080"
     environment:
-      - IPv4LOCALADDR=1.1.1.1
+      - IPv4LOCALADDR=95.213.189.130
       - IPAM=ipam:1034
       - PORT=:8080
       - DB_URL=postgres://postgres:postgresql@postgresdb:5432/tunnelbroker?sslmode=disable
-      - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
+      - BROKER_CONN=amqp://brokeruser:brokerpass@rabbitmq:5672/
       - QUEUENAME=6in4
       - COOKIEKEY1=my_secret_key1
       - COOKIEKEY2=my_secret_key2
-  # agent:
-  #   build:
-  #     context: agent
-  #   image: alex129/agent
-  #   restart: always
-  #   environment:
-  #     - BROKER_CONN="amqp://brokeruser:brokerpass@rabbitmq:5672/"
-  #     - QUEUENAME=6in4      
   ipam:
     build:
       context: ipam
-    image: alex129/ipam
+    # image: alex129/ipam
     restart: always
     environment:
       - PORT=1034
