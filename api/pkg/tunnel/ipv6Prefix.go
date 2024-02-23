@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/seancfoley/ipaddress-go/ipaddr"
 	"github.com/sirupsen/logrus"
 )
 
@@ -14,6 +15,7 @@ func GetEndpoints(ipv6str string, logf *logrus.Logger) (string, string) {
 	l := logf.WithFields(logrus.Fields{
 		"function": "GetEndpoints",
 	})
+
 	l.Infof("Input prefix %s", ipv6str)
 	val := strings.Split(ipv6str, "/")
 	ipv6addr := val[0]
@@ -72,7 +74,12 @@ func GetNetworkAddr(ipv6str string, logf *logrus.Logger) string {
 }
 
 func formatIPv6(buf []byte) string {
-	return fmt.Sprintf("%x:%x:%x:%x:%x:%x:%x:%x", buf[0:2], buf[2:4], buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:])
+	addr := fmt.Sprintf("%x:%x:%x:%x:%x:%x:%x:%x", buf[0:2], buf[2:4], buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:])
+	return shorterIPv6(addr)
+}
+
+func shorterIPv6(addr string) string {
+	return ipaddr.NewIPAddressString(addr).GetAddress().ToCompressedString()
 }
 
 func ipv6MyMask(maskLen int) []byte {
