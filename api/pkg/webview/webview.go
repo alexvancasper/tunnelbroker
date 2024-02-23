@@ -30,3 +30,9 @@ func IP(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"origin": c.RemoteIP()})
 	c.Abort()
 }
+
+func Help(c *gin.Context) {
+	c.HTML(http.StatusOK, "help.html", gin.H{
+		"Title": "TunnelBroker register",
+	})
+}

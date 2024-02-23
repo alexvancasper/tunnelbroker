@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"net/http"
 	"os"
+
+	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
@@ -65,6 +66,7 @@ func main() {
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
 	r.GET("/ip", webview.IP)
+	r.GET("/help", webview.Help)
 
 	r.POST("/signup", controllers.PostSignup)
 	r.POST("/login", controllers.PostLogin)

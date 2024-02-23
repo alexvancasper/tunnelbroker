@@ -1,16 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"math/big"
 	"net"
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
-	psql "github.com/alexvancasper/TunnelBroker/ipam/internal/database"
 	sh "github.com/alexvancasper/TunnelBroker/ipam/internal/servicesHandler"
 	formatter "github.com/fabienm/go-logrus-formatters"
 	"github.com/spf13/viper"
@@ -23,7 +20,7 @@ func main() {
 	viper.SetConfigFile("./pkg/common/envs/.env")
 	viper.ReadInConfig()
 
-	dbUrl := viper.Get("DB_URL").(string)
+	// dbUrl := viper.Get("DB_URL").(string)
 
 	//Initialize Logging connections
 	var MyLogger = logrus.New()
@@ -39,22 +36,22 @@ func main() {
 	sh.SHandler.Log = MyLogger
 
 	//Initialize database connections
-	sh.SHandler.DB, err = psql.New(dbUrl, 5)
-	sh.SHandler.Timeout = time.Duration(1000)
-	if err != nil {
-		MyLogger.WithField("DSN", dbUrl)
-		MyLogger.Fatal(err)
-	}
-	defer sh.SHandler.DB.CloseConnection()
-	MyLogger.Info("Database connection successfully")
+	// sh.SHandler.DB, err = psql.New(dbUrl, 5)
+	// sh.SHandler.Timeout = time.Duration(1000)
+	// if err != nil {
+	// 	MyLogger.WithField("DSN", dbUrl)
+	// 	MyLogger.Fatal(err)
+	// }
+	// defer sh.SHandler.DB.CloseConnection()
+	// MyLogger.Info("Database connection successfully")
 
-	err = psql.MigrationUP(sh.SHandler.DB)
-	if err != nil {
-		MyLogger.Fatal(err)
-	}
-	MyLogger.Info("Migration is done")
+	// err = psql.MigrationUP(sh.SHandler.DB)
+	// if err != nil {
+	// 	MyLogger.Fatal(err)
+	// }
+	// MyLogger.Info("Migration is done")
 
-	ipv6str := "3A03:ABCD:1805:0000::/127"
+	ipv6str := "2a06:1301:4210:0001::/64" //2a06:1301:4210::/48
 
 	val := strings.Split(ipv6str, "/")
 	ipv6addr := val[0]
@@ -72,8 +69,8 @@ func main() {
 	prefixBytes := v[1:]
 	maskBytes := ipv6MyMask(ipv6mask)
 	start, end := nextIPv6Range(prefixBytes, maskBytes, 1)
-	ctx := context.TODO()
-	query := "INSERT INTO p2p (prefix, released) VALUES"
+	// ctx := context.TODO()
+	query := "INSERT INTO delegated (prefix, released) VALUES"
 	n := 1000
 	for i := 0; i < n; i++ {
 		pref := fmt.Sprintf("%s/%d", formatIPv6(start), ipv6mask)
@@ -85,16 +82,16 @@ func main() {
 		start, end = nextIPv6Range(end, maskBytes, 1)
 	}
 	query += ";"
-	err = sh.SHandler.DB.Conn.Ping(ctx)
-	if err != nil {
-		fmt.Println("error ping")
-		return
-	}
-	_, err = sh.SHandler.DB.Conn.Query(ctx, query)
-	if err != nil {
-		fmt.Println("error insert")
-		return
-	}
+	// err = sh.SHandler.DB.Conn.Ping(ctx)
+	// if err != nil {
+	// 	fmt.Println("error ping")
+	// 	return
+	// }
+	// _, err = sh.SHandler.DB.Conn.Query(ctx, query)
+	// if err != nil {
+	// 	fmt.Println("error insert")
+	// 	return
+	// }
 	MyLogger.Infof("Prefix inserted successfully")
 	fmt.Println(query)
 
