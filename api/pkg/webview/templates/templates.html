@@ -250,15 +250,13 @@ window.onload = getPublicIP()
 
 
 {{ define "LoginForm" }}
-<p class="h1 mt-5">{{ .Title }}</p>
-    <br>
 <form id="loginform" method="POST" action="/login">
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
-    <div class="form-group w-25" >
+    <div class="form-group w-50" >
       <label for="exampleInputEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
     </div>
-    <div class="form-group  w-25">
+    <div class="form-group  w-50">
       <label for="exampleInputPassword1">Password</label>
       <input type="password" class="form-control" id="exampleInputPassword1" name="Password" placeholder="Password">
     </div>
