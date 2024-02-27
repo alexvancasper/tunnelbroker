@@ -58,5 +58,5 @@ func generateName(s string) string {
 	h := sha1.New()
 	h.Write([]byte(s))
 	sha1_hash := hex.EncodeToString(h.Sum(nil))
-	return sha1_hash[:5]
+	return fmt.Sprintf("%s%s", sha1_hash[:3], sha1_hash[len(sha1_hash)-3:])
 }
