@@ -33,6 +33,12 @@ func IP(c *gin.Context) {
 
 func Help(c *gin.Context) {
 	c.HTML(http.StatusOK, "help.html", gin.H{
-		"Title": "TunnelBroker register",
+		"Title": "TunnelBroker help page",
+	})
+}
+
+func About(c *gin.Context) {
+	c.HTML(http.StatusOK, "about.html", gin.H{
+		"Title": "TunnelBroker about page",
 	})
 }
