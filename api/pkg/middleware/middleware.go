@@ -19,12 +19,12 @@ func NotRequireAuth(c *gin.Context) {
 	// Get the cookie off the request
 	tokenString, err := c.Cookie("Authorization")
 
-	if err == nil {
-		fmt.Printf("error, already authorized\n")
-		c.Redirect(http.StatusTemporaryRedirect, "/user/")
-		c.Abort()
-		return
-	}
+	// if err == nil {
+	// 	fmt.Printf("error, already authorized\n")
+	// 	c.Redirect(http.StatusTemporaryRedirect, "/user/")
+	// 	c.Abort()
+	// 	return
+	// }
 
 	// Decode/validate it
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
