@@ -3,20 +3,23 @@ package broker
 import (
 	"context"
 	"fmt"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 const (
-	ADD    = "add"
-	DELETE = "delete"
+	ADD    MessageType = "add"
+	DELETE MessageType = "delete"
 )
+
+type MessageType string
 
 type MsgBroker struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
-	queue   map[string]amqp.Queue
+	queue   amqp.Queue
 }
 
 func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
@@ -57,45 +60,34 @@ func (m *MsgBroker) createChannel() error {
 
 func (m *MsgBroker) queueDeclare(queueName string) error {
 	var err error
-	m.queue = make(map[string]amqp.Queue)
-	m.queue[ADD], err = m.channel.QueueDeclare(
-		fmt.Sprintf("%s_%s", queueName, ADD), // name
-		false,                                // durable
-		false,                                // delete when unused
-		false,                                // exclusive
-		false,                                // no-wait
-		nil,                                  // arguments
+	m.queue, err = m.channel.QueueDeclare(
+		queueName, // name
+		false,     // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to declare ADD queue", err)
+		return fmt.Errorf("%s: %s", "Failed to declare queue", err)
 	}
 
-	m.queue[DELETE], err = m.channel.QueueDeclare(
-		fmt.Sprintf("%s_%s", queueName, DELETE), // name
-		false,                                   // durable
-		false,                                   // delete when unused
-		false,                                   // exclusive
-		false,                                   // no-wait
-		nil,                                     // arguments
-	)
-	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to declare DELETE queue", err)
-	}
 	return nil
 }
 
-func (m *MsgBroker) PublishMsg(data []byte, queueType string) error {
+func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var err error
 	err = m.channel.PublishWithContext(ctx,
-		"",                      // exchange
-		m.queue[queueType].Name, // routing key
-		false,                   // mandatory
-		false,                   // immediate
+		"",           // exchange
+		m.queue.Name, // routing key
+		false,        // mandatory
+		false,        // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
+			Type:        string(msgType),
 			Body:        data,
 		})
 	if err != nil {

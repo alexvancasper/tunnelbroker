@@ -10,14 +10,16 @@ import (
 )
 
 const (
-	ADD    = "add"
-	DELETE = "delete"
+	ADD    MessageType = "add"
+	DELETE MessageType = "delete"
 )
+
+type MessageType string
 
 type MsgBroker struct {
 	conn    *amqp.Connection
 	channel *amqp.Channel
-	queue   map[string]amqp.Queue
+	queue   amqp.Queue
 }
 
 func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
@@ -40,13 +42,13 @@ func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
 
 func (m *MsgBroker) AddRegisterConsumer() (<-chan amqp.Delivery, error) {
 	msg, err := m.channel.Consume(
-		m.queue[ADD].Name, // queue
-		"",                // consumer
-		true,              // auto-ack
-		false,             // exclusive
-		false,             // no-local
-		false,             // no-wait
-		nil,               // args
+		m.queue.Name, // queue
+		"",           // consumer
+		true,         // auto-ack
+		false,        // exclusive
+		false,        // no-local
+		false,        // no-wait
+		nil,          // args
 	)
 	if err != nil {
 		return nil, err
@@ -54,34 +56,19 @@ func (m *MsgBroker) AddRegisterConsumer() (<-chan amqp.Delivery, error) {
 	return msg, nil
 }
 
-func (m *MsgBroker) DeleteRegisterConsumer() (<-chan amqp.Delivery, error) {
-	msg, err := m.channel.Consume(
-		m.queue[DELETE].Name, // queue
-		"",                   // consumer
-		true,                 // auto-ack
-		false,                // exclusive
-		false,                // no-local
-		false,                // no-wait
-		nil,                  // args
-	)
-	if err != nil {
-		return nil, err
-	}
-	return msg, nil
-}
-
-func (m *MsgBroker) PublishMsg(data []byte, queueType string) error {
+func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	var err error
 	err = m.channel.PublishWithContext(ctx,
-		"",                      // exchange
-		m.queue[queueType].Name, // routing key
-		false,                   // mandatory
-		false,                   // immediate
+		"",           // exchange
+		m.queue.Name, // routing key
+		false,        // mandatory
+		false,        // immediate
 		amqp.Publishing{
 			ContentType: "application/json",
+			Type:        string(msgType),
 			Body:        data,
 		})
 	if err != nil {
@@ -111,29 +98,16 @@ func (m *MsgBroker) createChannel() error {
 
 func (m *MsgBroker) queueDeclare(queueName string) error {
 	var err error
-	m.queue = make(map[string]amqp.Queue)
-	m.queue[ADD], err = m.channel.QueueDeclare(
-		fmt.Sprintf("%s_%s", queueName, ADD), // name
-		false,                                // durable
-		false,                                // delete when unused
-		false,                                // exclusive
-		false,                                // no-wait
-		nil,                                  // arguments
+	m.queue, err = m.channel.QueueDeclare(
+		queueName, // name
+		false,     // durable
+		false,     // delete when unused
+		false,     // exclusive
+		false,     // no-wait
+		nil,       // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to declare ADD queue", err)
-	}
-
-	m.queue[DELETE], err = m.channel.QueueDeclare(
-		fmt.Sprintf("%s_%s", queueName, DELETE), // name
-		false,                                   // durable
-		false,                                   // delete when unused
-		false,                                   // exclusive
-		false,                                   // no-wait
-		nil,                                     // arguments
-	)
-	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to declare DELETE queue", err)
+		return fmt.Errorf("%s: %s", "Failed to declare queue", err)
 	}
 	return nil
 }
