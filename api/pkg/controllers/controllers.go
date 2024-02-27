@@ -36,6 +36,13 @@ func PostSignup(c *gin.Context) {
 	}
 	user := models.User{Login: body.Email, Password: string(hash), API: generateAPI()}
 
+	var userDB models.User
+	if userExist := db.DB.Where("login = ?", body.Email).First(&userDB); userExist.Error == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "User already exist"})
+		c.Abort()
+		return
+	}
+
 	result := db.DB.Create(&user)
 
 	if result.Error != nil {
