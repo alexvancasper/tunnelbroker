@@ -4,8 +4,7 @@ permissions:
   contents: write
 on:
   push:
-    branches:
-      - "dev"
+    branches: ["dev", "main"]
   # # Triggered on new GitHub Release
   # release:
   #   types: [published]
