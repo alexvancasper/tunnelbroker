@@ -23,6 +23,8 @@ on:
         description: Tag you want to release.
         required: true
 
+env:
+
 jobs:
   build_and_push:
     runs-on: ubuntu-22.04
@@ -50,6 +52,9 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Check env vars
+        run: echo ${{ env.DOCKER_USER }}/${{ env.DOCKER_REPOSITORY }}
+        
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
