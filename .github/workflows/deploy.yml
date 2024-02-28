@@ -24,7 +24,8 @@ on:
         required: true
 
 env:
-  DAY_OF_WEEK: Monday
+  DOCKER_USER: alex129
+  DOCKER_REPOSITORY: tunnelbroker
 
 jobs:
   build_and_push:
