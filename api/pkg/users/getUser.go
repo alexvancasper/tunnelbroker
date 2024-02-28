@@ -22,11 +22,11 @@ func (h handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	ipport := c.Request.RemoteAddr
+	realIP := c.GetHeader("HTTP_X_REAL_IP")
 	c.HTML(http.StatusOK, "user.html", gin.H{
 		"Title":    "User room",
 		"Token":    csrf.GetToken(c),
 		"User":     user,
-		"ClientIP": ipport[0],
+		"ClientIP": realIP,
 	})
 }
