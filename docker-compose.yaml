@@ -4,6 +4,7 @@ services:
   api:
     build:
       context: api
+    image: alex129/api
     restart: always
     ports:
         - "8080:8080"
@@ -19,6 +20,7 @@ services:
   ipam:
     build:
       context: ipam
+    image: alex129/ipam
     restart: always
     environment:
       - PORT=1034

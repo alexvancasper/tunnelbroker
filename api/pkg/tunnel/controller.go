@@ -23,7 +23,7 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, m *broker.MsgBroker, logf *logru
 	routes := r.Group("/tunnel/:api")
 	routes.POST("/", h.AddTunnel)
 	routes.GET("/:id", h.GetTunnel)
-	routes.PUT("/:id", h.UpdateTunnel)
+	// routes.PUT("/:id", h.UpdateTunnel)
 	routes.DELETE("/:id", h.DeleteTunnel)
 	// routes.GET("/", h.GetTunnels)
 

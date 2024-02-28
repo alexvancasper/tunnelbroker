@@ -2,9 +2,9 @@ package tunnels
 
 import (
 	"fmt"
-	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"net/http"
 
+	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -32,6 +32,14 @@ func (h handler) AddTunnel(c *gin.Context) {
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find user with provided API key %s", api)
 		c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		return
+	}
+
+	//Check for user tunnel limit
+	if user.TunnelCount >= user.TunnelLimit {
+		l.Debugf("You have reached tunnel limit %d", user.TunnelLimit)
+		//c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
 		return
 	}
 
@@ -79,6 +87,10 @@ func (h handler) AddTunnel(c *gin.Context) {
 			return
 		}
 	}()
+
+	newTunnelCount := user.TunnelCount + 1
+	l.Debugf("user tunnel count increased %d->%d", user.TunnelCount, newTunnelCount)
+	h.DB.Model(&user).Update("tunnel_count", newTunnelCount)
 
 	l.Debugf("Tunnel data: %+v", tunnel)
 	l.Infof("Tunnel created tunnel_id %d", tunnel.ID)

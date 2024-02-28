@@ -56,6 +56,10 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 	h.DB.Delete(&tunnel)
 	l.Infof("Tunnel deleted from DB with id %d", tunnel.ID)
 
+	newTunnelCount := user.TunnelCount - 1
+	l.Debugf("user tunnel count decreased %d->%d", user.TunnelCount, newTunnelCount)
+	h.DB.Model(&user).Update("tunnel_count", newTunnelCount)
+
 	networkAddr := GetNetworkAddr(tunnel.IPv6ClientEndpoint, h.Logf)
 	releaseIPv6Prefixes(networkAddr, h.Logf)
 	l.Infof("IPv6Endpoint network released %s", networkAddr)

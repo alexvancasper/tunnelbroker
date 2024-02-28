@@ -18,6 +18,16 @@
 {{ end }}
 
 {{ define "footer" }}
+<center>
+    <p class="mt-5 text-monospace">
+        <a href="/help">Помощь</a>
+        |
+        <a href="/about">О проекте</a>
+        |
+        <a href="https://t.me/tunnelsupport">Техническая поддержка</a>
+    </p>
+</center>
+
 </div>
 </body>
 </html>
@@ -145,7 +155,7 @@ addtunnel.onsubmit = async (e) => {
       <div class="form-group row w-50">
         <label for="IPv4Remote" class="col-sm-3 col-form-label">IPv4 client address</label>
         <div class="col-sm-5 mt-3">
-          <input type="text" class="form-control" id="IPv4Remote" name="IPv4Remote" placeholder="185.123.11.3">
+          <input type="text" class="form-control" id="IPv4Remote" name="IPv4Remote" placeholder="175.123.11.3", value="{{ .ClientIP }}">
         </div>
       </div> 
       <button type="submit" class="btn btn-success">Add new tunnel</button> 
@@ -173,14 +183,6 @@ addtunnel.onsubmit = async (e) => {
     }
   });
 };
-function getPublicIP() {
-  fetch('http://httpbin.org/ip')
-    .then(response => response.json())
-    .then(data => {
-        IPv4Remote.value = data.origin
-    });
-}
-window.onload = getPublicIP()
 </script>
 {{ end }}
 
@@ -216,10 +218,6 @@ window.onload = getPublicIP()
                 <td> {{ $element.PD }}  </td>
             </tr>    
             <tr>
-                <th> Already configured </th>
-                <td> {{ $element.Configured }}  </td>
-            </tr>
-            <tr>
                 <th> Action </th>
                 <td>  <button class="control-action btn btn-danger" id="{{ $element.ID }}">Delete</button>  </td>
             </tr>
@@ -250,15 +248,13 @@ window.onload = getPublicIP()
 
 
 {{ define "LoginForm" }}
-<p class="h1 mt-5">{{ .Title }}</p>
-    <br>
 <form id="loginform" method="POST" action="/login">
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
-    <div class="form-group w-25" >
+    <div class="form-group w-50" >
       <label for="exampleInputEmail1">Email address</label>
       <input type="email" class="form-control" id="exampleInputEmail1" name="Email" aria-describedby="emailHelp" placeholder="Enter email">
     </div>
-    <div class="form-group  w-25">
+    <div class="form-group  w-50">
       <label for="exampleInputPassword1">Password</label>
       <input type="password" class="form-control" id="exampleInputPassword1" name="Password" placeholder="Password">
     </div>

@@ -17,7 +17,9 @@
 
     {{ template "ListTunnels" . }}
 
-    {{ template "addtunnel2" . }}
+        {{ if lt .User.TunnelCount .User.TunnelLimit }}
+            {{ template "addtunnel2" . }}
+        {{ end }}
 </center>
 <br>  
 

@@ -1,55 +1,23 @@
-ip tunnel add tun-6in4 mode sit remote <client ipv4 addr> local <local ipv4> 
-ip link set tun-6in4  up
-ip addr add 2001:db8:::1/64 dev tun-6in4
+# Tunnel Broker
 
-ip route add 
-
-ip tunnel add tun-6in4 mode sit remote 1.6.4.1 local 185.185.58.180
-# list of commands
-ip tunnel add tun-6in4 mode sit remote 185.60.45.135 local 185.185.58.180
-ip addr add 2a00::1/127 dev tun-6in4
-
-# tunnel up
-ip link set tun-6in4 up
-
-# tunnel down
-ip link set tun-6in4 down
-
-# add route via interface
-ip -6 route add 2a00:1::/64 dev tun-6in4
-
-# check ipv6 route via tunnel interface
-ip -6 route show
+### Классическая схема сети на IPv4 адресах
+Схема ниже показывает пример текущей домашней сети. У пользователя дома есть Wi-Fi роутер который подключается к интернет через своего провайдера. Провайдер выдает либо серый, либо белый IP. К сожалению 6in4 не будет работать с серым адрес и для использования сервиса нужен публичный (белый) IPv4 адрес на домашнем роутере. Как правило в своем личном кабинете у провайдера можно заказать услугу белый адрес или статический белый адрес.
+![Классическая схема сети на IPv4 адресах](img/home-network-ipv4-back.png "Пример сети")
 
 
-# template
-ip tunnel add {{tun-name}} mode sit remote {{remote-ipv4}} local {{local-ipv4}}
-ip link set {{tun-name}} up
-ip addr add {{local-ipv6}} dev {{tun-name}}
-ip -6 route add {{ipv6-pd}} dev {{tun-name}}
+В этой схеме нет возможности получить доступ в IPv6 интернет поскольку для этого нужны специальные IPv6 адреса. Некоторые операторы домашнего интернета и мобильные операторы уже выдают IPv4 и IPv6 адрес в dual-stack т.е. одновременно, но многие еще даже не задумываются об этом. Хотя почти все контент провайдеры уже есть в IPv6 интернете и выдача dual-stack адресов для операторов будет выгодня в сокращении количества NAT трансляций и повышения стабильности доступа в интернет.
+
+### Схема сети на IPv4/IPv6 адресах
+Теперь посмотрим на домашнюю сеть с использованием 6in4 туннеля
+![Схема сети на IPv4/IPv6 адресах](img/home-network-6in4-back.png "Пример сети")
+
+При использовании сервиса 6in4 между нашим сервисом и вашим белым адресом на роутере будет построен туннель 6in4 который будет упаковывать IPv6 пакеты в IPv4, поэтому туннель так и называется 6in4 -> 6в4. Так же будет прописана дополнительная сеть /64 которая будет использоваться для адресации устройств в домашней сети т.о. домашний сервер будет доступен в Интернете с настоящим белым IPv6 адресом. Затем эти пакеты по IPv4 сети дойдут до нашего сервера, сервер их распакует и отправит дальше в IPv6 интернет, обратно ответ будет упакован аналогично.
 
 
+Итак:
+- сеть /127 между сервером и домашним роутером это сеть Point-to-point - P2P.
+- cеть /64 для адресации домашних устройств это сеть Prefix Delegation - PD.
 
-# API description
 
-1. register the client
-1.1 Receive  email and   password
-1.2 generate new api key
+Поскольку не все пользователи знают и умеют защищать домашнюю сеть от внешний угроз, наш сервис позволяет запретить все внешние подключения к IPv6 PD адресам по портам >1024. Если нужен это изменить, пишите в техническую поддержку в телеграм (@tunnelsupport - 6in4 Support). IPv6 умеет работать с DNS по IPv4, вернее сказать DNS умеет отвечать на ipv4/ipv6 запросы независимо от сети через которую пришел запрос, но мы все равно рекомендуем прописать IPv6 DNS адреса.
 
-2. create 6in4 tunnel
-2.1 define nearest server for the client
-2.2 get client's ipv4 address
-2.3 get ipv6 interface addresses /127
-2.4 get ipv6 pd prefix /64
-2.5 create template for interface
-2.6 provisioning the interface and route via interface
-
-3. update the tunnel
-3.1 receive update with proper API key, update the ipv4 remote address.
-    unconfigure->configure new tunnel
-
-4. For registered users
-    list of configured tunnels
-        actions: Add, Delete
-    API key:
-        actions: Update
