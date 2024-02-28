@@ -3,15 +3,18 @@ permissions:
   packages: write
   contents: write
 on:
-  # Triggered on new GitHub Release
-  release:
-    types: [published]
-  # Triggered on every successful Build action
-  workflow_run:
-    workflows: ["Build"]
-    branches: [dev]
-    types:
-      - completed
+  push:
+    branches:
+      - "dev"
+  # # Triggered on new GitHub Release
+  # release:
+  #   types: [published]
+  # # Triggered on every successful Build action
+  # workflow_run:
+  #   workflows: ["Build"]
+  #   branches: [dev]
+  #   types:
+  #     - completed
   # Manual trigger for rollback to specific release or redeploy latest
   workflow_dispatch:
     inputs:
