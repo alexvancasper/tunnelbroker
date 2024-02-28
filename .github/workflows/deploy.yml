@@ -35,7 +35,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install golang
         uses: actions/setup-go@v4
@@ -88,8 +88,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion != 'failure' }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
-            
+        uses: actions/checkout@v4
+
       - name: Set tag env
         id: vars
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
@@ -100,9 +100,12 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      - name: Show tag short
+        run: export TAG_SHORT=${{ steps.vars.outputs.sha_short }}
+
       # Deploy Docker image with your application using `docker compose up app` remotely
       - name: remote docker-compose up via ssh
-        uses: appleboy/ssh-action@v0.1.5
+        uses: appleboy/ssh-action@v1.0.3
         env:
           TAG_SHORT: ${{ steps.vars.outputs.sha_short }}
         with:
