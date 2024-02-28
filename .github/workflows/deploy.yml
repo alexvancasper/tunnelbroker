@@ -25,7 +25,8 @@ on:
 
 env:
   HUB_USER: alex129
-  DOCKER_REPOSITORY: tunnelbroker
+  API_REPO: api
+  IPAM_REPO: ipam
   TAG_SHORT: 
 
 jobs:
@@ -70,9 +71,16 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: "api"
+          context: ${{ env.API_REPO }}
           push: true
-          tags: ${{ env.HUB_USER }}/${{ env.DOCKER_REPOSITORY }}:${{ steps.vars.outputs.sha_short }}
+          tags: ${{ env.HUB_USER }}/${{ env.API_REPO }}:${{ steps.vars.outputs.sha_short }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.IPAM_REPO }}
+          push: true
+          tags: ${{ env.HUB_USER }}/${{ env.IPAM_REPO }}:${{ steps.vars.outputs.sha_short }}
 
   deploy_via_ssh:
     needs: build_and_push
@@ -107,13 +115,15 @@ jobs:
       #       docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml pull
       #       docker compose -f ./docker-compose.yml -f ./docker-compose.prod.yml up app-migration
 
+      - name: Login to Docker hub Container Registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       # Deploy Docker image with your application using `docker compose up app` remotely
       - name: remote docker-compose up via ssh
         uses: appleboy/ssh-action@v0.1.5
-        env:
-          APPTOKEN: ${{ secrets.DOCKER_TOKEN }}
-          USERNAME: ${{ secrets.DOCKER_USER }}
-          REPOSITORY: ${{ env.DOCKER_REPOSITORY }}
         with:
           host: ${{ secrets.VM_SSH_HOST }}
           username: ${{ secrets.VM_SSH_USER }}
@@ -121,7 +131,6 @@ jobs:
           port: ${{ secrets.VM_SSH_PORT }}
           envs: APPTOKEN,USERNAME
           script: |
-            echo $APPTOKEN | docker login -u $USERNAME --password-stdin
             cd /opt/6in4/
             docker compose -f ./docker-compose.prod.yaml pull
             docker compose -f ./docker-compose.prod.yaml down
