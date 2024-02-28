@@ -1,7 +1,6 @@
 package users
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
@@ -23,12 +22,9 @@ func (h handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("Headers: %+v\n", c.Request.Header)
-
 	c.HTML(http.StatusOK, "user.html", gin.H{
-		"Title":    "User room",
-		"Token":    csrf.GetToken(c),
-		"User":     user,
-		"ClientIP": c.RemoteIP(),
+		"Title": "User room",
+		"Token": csrf.GetToken(c),
+		"User":  user,
 	})
 }
