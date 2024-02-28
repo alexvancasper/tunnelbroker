@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
@@ -21,6 +22,8 @@ func (h handler) GetUser(c *gin.Context) {
 		c.AbortWithError(http.StatusNotFound, result.Error)
 		return
 	}
+
+	fmt.Printf("Headers: %+v\n", c.Request.Header)
 
 	c.HTML(http.StatusOK, "user.html", gin.H{
 		"Title":    "User room",
