@@ -54,7 +54,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ secrets.DOCKER_USER }}/${{ env.DOCKER_REPOSITORY }}:latest
+          # tags: ${{ secrets.DOCKER_USER }}/${{ env.DOCKER_REPOSITORY }}:latest
 
   deploy_via_ssh:
     needs: build_and_push
