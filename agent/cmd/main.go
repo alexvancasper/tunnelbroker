@@ -28,7 +28,8 @@ func main() {
 	}
 	MyLogger.SetLevel(loglevel)
 
-	// Initialize message broker connection
+	var wg sync.WaitGroup
+
 	m, err := broker.MsgBrokerInit(os.Getenv("BROKER_CONN"), os.Getenv("QUEUENAME"))
 	if err != nil {
 		MyLogger.Fatalf("Message broker error init: %s", err)
@@ -37,27 +38,35 @@ func main() {
 
 	MyLogger.Debug("Message broker connected")
 
-	msgs, err := m.AddRegisterConsumer()
+	msgs, err := m.RegisterConsumer()
 	if err != nil {
-		MyLogger.Fatalf("AddRegisterConsumer error: %s", err)
+		MyLogger.Fatalf("RegisterConsumer error: %s", err)
 	}
-	var wg sync.WaitGroup
-	ctx, ctxCancel := context.WithCancel(context.Background())
 
 	MyLogger.Info(" [*] Waiting for messages. To exit press CTRL+C")
+
+	ctx, ctxCancel := context.WithCancel(context.Background())
 	wg.Add(1)
-	go Listener(ctx, &wg, msgs, MyLogger)
+	closeChan := make(chan struct{})
+	go Listener(ctx, &wg, MyLogger, msgs, closeChan)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)
-	<-c
-	MyLogger.Info("Graceful shutdown")
+	select {
+	case <-c:
+		MyLogger.Error("Interrupt signal recevied")
+	case <-closeChan:
+		MyLogger.Error("Shutdown due to communication issue")
+		return
+	}
 	ctxCancel()
-
+	wg.Wait()
+	MyLogger.Info("Graceful shutdown")
 }
 
-func Listener(ctx context.Context, wg *sync.WaitGroup, msgs <-chan amqp091.Delivery, log *logrus.Logger) {
+func Listener(ctx context.Context, wg *sync.WaitGroup, log *logrus.Logger, msgs <-chan amqp091.Delivery, closeChan chan<- struct{}) {
 	defer wg.Done()
+	defer close(closeChan)
 	l := log.WithField("function", "Listener")
 	h := doer.Handler{
 		Log: log,
@@ -68,8 +77,13 @@ func Listener(ctx context.Context, wg *sync.WaitGroup, msgs <-chan amqp091.Deliv
 		case <-ctx.Done():
 			l.Debug("Context closed")
 			return
-		case msg := <-msgs:
-			l.WithField("message type", msg.Type).WithField("body", msg.Body).Infof("Received message from queue")
+		case msg, ok := <-msgs:
+			if !ok {
+				closeChan <- struct{}{}
+				l.Error("Listener closed due to recv channel is closed")
+				return
+			}
+			l.WithField("message type", msg.Type).WithField("body", msg.Body).Info("Received message from queue")
 			switch msg.Type {
 			case string(broker.ADD):
 				wg.Add(1)
