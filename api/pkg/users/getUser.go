@@ -22,7 +22,7 @@ func (h handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	realIP := c.GetHeader("HTTP_X_REAL_IP")
+	realIP := c.GetHeader("X-Forwarded-For")
 	c.HTML(http.StatusOK, "user.html", gin.H{
 		"Title":    "User room",
 		"Token":    csrf.GetToken(c),
