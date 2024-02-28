@@ -24,6 +24,7 @@ on:
         required: true
 
 env:
+  DAY_OF_WEEK: Monday
 
 jobs:
   build_and_push:
@@ -54,7 +55,7 @@ jobs:
 
       - name: Check env vars
         run: echo ${{ env.DOCKER_USER }}/${{ env.DOCKER_REPOSITORY }}
-        
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
