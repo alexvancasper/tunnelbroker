@@ -24,7 +24,7 @@ on:
         required: true
 
 env:
-  DOCKER_USER: alex129
+  HUB_USER: alex129
   DOCKER_REPOSITORY: tunnelbroker
 
 jobs:
@@ -61,7 +61,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: ${{ env.DOCKER_USER }}/${{ env.DOCKER_REPOSITORY }}:latest
+          tags: ${{ env.HUB_USER }}/${{ env.DOCKER_REPOSITORY }}:latest
 
   deploy_via_ssh:
     needs: build_and_push
