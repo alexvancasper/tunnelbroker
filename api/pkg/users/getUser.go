@@ -1,6 +1,7 @@
 package users
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
@@ -22,11 +23,12 @@ func (h handler) GetUser(c *gin.Context) {
 		return
 	}
 
-	realIP := c.GetHeader("X-Forwarded-For")
+	fmt.Printf("Headers: %+v\n", c.Request.Header)
+
 	c.HTML(http.StatusOK, "user.html", gin.H{
 		"Title":    "User room",
 		"Token":    csrf.GetToken(c),
 		"User":     user,
-		"ClientIP": realIP,
+		"ClientIP": c.RemoteIP(),
 	})
 }
