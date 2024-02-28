@@ -40,7 +40,11 @@ func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
 	return &msg, nil
 }
 
-func (m *MsgBroker) AddRegisterConsumer() (<-chan amqp.Delivery, error) {
+func (m *MsgBroker) IsAlive() bool {
+	return !m.conn.IsClosed()
+}
+
+func (m *MsgBroker) RegisterConsumer() (<-chan amqp.Delivery, error) {
 	msg, err := m.channel.Consume(
 		m.queue.Name, // queue
 		"",           // consumer
@@ -60,8 +64,7 @@ func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var err error
-	err = m.channel.PublishWithContext(ctx,
+	err := m.channel.PublishWithContext(ctx,
 		"",           // exchange
 		m.queue.Name, // routing key
 		false,        // mandatory
