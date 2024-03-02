@@ -24,14 +24,11 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       
-      - name: Check folders
-        run: ls -la
-
       - name: Linters
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
-          working-directory: api/
+          # working-directory: 
 
   # tests:
   #   runs-on: ubuntu-latest
