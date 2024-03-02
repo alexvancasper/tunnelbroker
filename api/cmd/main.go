@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
-
 	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
@@ -21,9 +20,8 @@ import (
 )
 
 func main() {
-
-	//Initialize Logging connections
-	var MyLogger = logrus.New()
+	// Initialize Logging connections
+	MyLogger := logrus.New()
 
 	gelfFmt := formatter.NewGelf("API")
 	MyLogger.SetFormatter(gelfFmt)
@@ -36,8 +34,8 @@ func main() {
 
 	// Initialize DB connection
 	port := os.Getenv("PORT")
-	dbUrl := os.Getenv("DB_URL")
-	h := db.Init(dbUrl)
+	dbURL := os.Getenv("DB_URL")
+	h := db.Init(dbURL)
 
 	// Initialize message broker connection
 	m, err := broker.MsgBrokerInit(os.Getenv("BROKER_CONN"), os.Getenv("QUEUENAME"))

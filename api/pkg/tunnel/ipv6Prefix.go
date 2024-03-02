@@ -76,7 +76,8 @@ func GetNetworkAddr(ipv6str string, logf *logrus.Logger) string {
 }
 
 func formatIPv6(buf []byte) string {
-	addr := fmt.Sprintf("%x:%x:%x:%x:%x:%x:%x:%x", buf[0:2], buf[2:4], buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:])
+	addr := fmt.Sprintf("%x:%x:%x:%x:%x:%x:%x:%x",
+		buf[0:2], buf[2:4], buf[4:6], buf[6:8], buf[8:10], buf[10:12], buf[12:14], buf[14:])
 	return shorterIPv6(addr)
 }
 
@@ -96,9 +97,9 @@ func ipv6MyMask(maskLen int) []byte {
 			b--
 		}
 		if i < zeroBits {
-			buf[b] = buf[b] | (0 << offset)
+			buf[b] |= (0 << offset)
 		} else {
-			buf[b] = buf[b] | (1 << offset)
+			buf[b] |= (1 << offset)
 		}
 	}
 	return buf
@@ -138,52 +139,52 @@ func incv6IP(ip []byte) []byte {
 																if ip[0] == 255 {
 																	ip[0] = 0
 																} else {
-																	ip[0] += 1
+																	ip[0]++
 																}
 															} else {
-																ip[1] += 1
+																ip[1]++
 															}
 														} else {
-															ip[2] += 1
+															ip[2]++
 														}
 													} else {
-														ip[3] += 1
+														ip[3]++
 													}
 												} else {
-													ip[4] += 1
+													ip[4]++
 												}
 											} else {
-												ip[5] += 1
+												ip[5]++
 											}
 										} else {
-											ip[6] += 1
+											ip[6]++
 										}
 									} else {
-										ip[7] += 1
+										ip[7]++
 									}
 								} else {
-									ip[8] += 1
+									ip[8]++
 								}
 							} else {
-								ip[9] += 1
+								ip[9]++
 							}
 						} else {
-							ip[10] += 1
+							ip[10]++
 						}
 					} else {
-						ip[11] += 1
+						ip[11]++
 					}
 				} else {
-					ip[12] += 1
+					ip[12]++
 				}
 			} else {
-				ip[13] += 1
+				ip[13]++
 			}
 		} else {
-			ip[14] += 1
+			ip[14]++
 		}
 	} else {
-		ip[15] += 1
+		ip[15]++
 	}
 	return ip
 }

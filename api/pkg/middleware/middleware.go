@@ -1,16 +1,14 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
-
-	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
-
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
-
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -19,7 +17,7 @@ func NotRequireAuth(c *gin.Context) {
 	// Get the cookie off the request
 	tokenString, err := c.Cookie("Authorization")
 
-	if err == http.ErrNoCookie {
+	if errors.Is(err, http.ErrNoCookie) {
 		c.Next()
 	}
 
@@ -47,13 +45,11 @@ func NotRequireAuth(c *gin.Context) {
 		return
 	}
 	c.Next()
-
 }
 
 func RequireAuth(c *gin.Context) {
 	// Get the cookie off the request
 	tokenString, err := c.Cookie("Authorization")
-
 	if err != nil {
 		fmt.Printf("error, not authorized %v\n", err)
 		c.Redirect(http.StatusTemporaryRedirect, "/login")

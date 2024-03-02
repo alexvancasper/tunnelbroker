@@ -24,7 +24,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 	routes := r.Group("/user", middleware.RequireAuth)
 	routes.GET("/", h.GetUser)
 	routes.DELETE("/", h.DeleteUser)
-
 }
 
 func getIDfromToken(c *gin.Context) (uint, error) {

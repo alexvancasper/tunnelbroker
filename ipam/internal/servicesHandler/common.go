@@ -10,11 +10,11 @@ import (
 
 // Handler set of variables for DB management
 type Handler struct {
-	//Database connection instance
+	// Database connection instance
 	DB *db.Instance
-	//Log instance
+	// Log instance
 	Log *logrus.Logger
-	//Timeout - database timeout
+	// Timeout - database timeout
 	Timeout time.Duration
 }
 

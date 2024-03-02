@@ -43,5 +43,4 @@ func TestCorrectkIP(t *testing.T) {
 			req.Equal(testCase.want, res)
 		})
 	}
-
 }

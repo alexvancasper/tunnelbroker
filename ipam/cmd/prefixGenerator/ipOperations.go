@@ -11,8 +11,7 @@ import (
 )
 
 func main() {
-
-	ipv6str := "2a06:1301:4210::/127" //2a06:1301:4210::/48
+	ipv6str := "2a06:1301:4210::/127" // 2a06:1301:4210::/48
 
 	val := strings.Split(ipv6str, "/")
 	ipv6addr := val[0]
@@ -44,7 +43,6 @@ func main() {
 	query += ";"
 
 	fmt.Println(query)
-
 }
 
 func ipv6MyMask(maskLen int) []byte {
@@ -89,11 +87,12 @@ func nextIPv6Range(ip, mask []byte, rangeCount int) ([]byte, []byte) {
 	}
 	return f, l
 }
+
 func nextv6Range(ip, mask []byte) ([]byte, []byte) {
 	firstIP := make([]byte, 16)
 	lastIP := make([]byte, 16)
 
-	for idx, _ := range ip {
+	for idx := range ip {
 		firstIP[idx] = ip[idx] & mask[idx]
 		lastIP[idx] = ip[idx] | ^mask[idx]
 	}

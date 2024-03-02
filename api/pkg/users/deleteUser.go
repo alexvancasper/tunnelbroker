@@ -8,7 +8,7 @@ import (
 )
 
 func (h handler) DeleteUser(c *gin.Context) {
-	userId, err := getIDfromToken(c)
+	userID, err := getIDfromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
@@ -16,7 +16,7 @@ func (h handler) DeleteUser(c *gin.Context) {
 
 	var user models.User
 
-	if result := h.DB.First(&user, userId); result.Error != nil {
+	if result := h.DB.First(&user, userID); result.Error != nil {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}

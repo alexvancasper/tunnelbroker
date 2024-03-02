@@ -29,5 +29,4 @@ func TestGenerateName(t *testing.T) {
 			req.Equal(testCase.want, res)
 		})
 	}
-
 }

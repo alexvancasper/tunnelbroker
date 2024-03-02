@@ -37,11 +37,12 @@ func (h handler) AddTunnel(c *gin.Context) {
 		return
 	}
 
-	//Check for user tunnel limit
+	// Check for user tunnel limit
 	if user.TunnelCount >= user.TunnelLimit {
 		l.Debugf("You have reached tunnel limit %d", user.TunnelLimit)
-		//c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
+		// c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
+		c.AbortWithStatusJSON(http.StatusBadRequest,
+			gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
 		return
 	}
 

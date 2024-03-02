@@ -42,9 +42,9 @@ func MsgBrokerInit(connStr, queueName string) (*MsgBroker, error) {
 
 func (m *MsgBroker) connect(connStr string) error {
 	var err error
-	m.conn, err = amqp.Dial(connStr) //"amqp://guest:guest@localhost:5672/"
+	m.conn, err = amqp.Dial(connStr) // "amqp://guest:guest@localhost:5672/"
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to connect to RabbitMQ", err)
+		return fmt.Errorf("%s: %w", "Failed to connect to RabbitMQ", err)
 	}
 	return nil
 }
@@ -53,7 +53,7 @@ func (m *MsgBroker) createChannel() error {
 	var err error
 	m.channel, err = m.conn.Channel()
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to open a channel", err)
+		return fmt.Errorf("%s: %w", "Failed to open a channel", err)
 	}
 	return nil
 }
@@ -69,7 +69,7 @@ func (m *MsgBroker) queueDeclare(queueName string) error {
 		nil,       // arguments
 	)
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to declare queue", err)
+		return fmt.Errorf("%s: %w", "Failed to declare queue", err)
 	}
 
 	return nil
@@ -90,7 +90,7 @@ func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 			Body:        data,
 		})
 	if err != nil {
-		return fmt.Errorf("%s: %s", "Failed to publish a message", err)
+		return fmt.Errorf("%s: %w", "Failed to publish a message", err)
 	}
 	log.Printf(" [x] Sent %s\n", data)
 	return nil
@@ -99,6 +99,7 @@ func (m *MsgBroker) PublishMsg(data []byte, msgType MessageType) error {
 func (m *MsgBroker) connClose() {
 	_ = m.conn.Close()
 }
+
 func (m *MsgBroker) channelClose() {
 	_ = m.channel.Close()
 }

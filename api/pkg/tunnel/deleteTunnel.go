@@ -1,14 +1,15 @@
 package tunnels
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
-
 	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -81,7 +82,9 @@ func releaseIPv6Prefixes(prefix string, logf *logrus.Logger) {
 	prefixData := strings.Split(prefix, "/")
 	requestURL := fmt.Sprintf("http://%s/release?prefix=%s&prefixlen=%s", os.Getenv("IPAM"), prefixData[0], prefixData[1])
 	l.Debugf("requestURL %s", requestURL)
-	req, err := http.NewRequest(http.MethodDelete, requestURL, nil)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
+	defer ctxCancel()
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, requestURL, nil)
 	if err != nil {
 		l.Errorf("client: could not create request: %s\n", err)
 	}
@@ -89,6 +92,7 @@ func releaseIPv6Prefixes(prefix string, logf *logrus.Logger) {
 	if err != nil {
 		l.Errorf("client: error making http request: %s\n", err)
 	}
+	defer res.Body.Close()
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		l.Errorf("client: could not read response body: %s\n", err)
