@@ -18,7 +18,8 @@ func (h handler) GetUser(c *gin.Context) {
 	var user models.User
 
 	if result := h.DB.Model(&models.User{}).Preload("Tunnels").First(&user, id); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		// c.AbortWithError(http.StatusNotFound, result.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}
 

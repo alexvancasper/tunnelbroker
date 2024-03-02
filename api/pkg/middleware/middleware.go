@@ -19,6 +19,10 @@ func NotRequireAuth(c *gin.Context) {
 	// Get the cookie off the request
 	tokenString, err := c.Cookie("Authorization")
 
+	if err == http.ErrNoCookie {
+		c.Next()
+	}
+
 	// if err == nil {
 	// 	fmt.Printf("error, already authorized\n")
 	// 	c.Redirect(http.StatusTemporaryRedirect, "/user/")

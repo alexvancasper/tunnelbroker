@@ -35,8 +35,9 @@ func GetEndpoints(ipv6str string, logf *logrus.Logger) (string, string) {
 	ip6 := v[1:]
 	mask := ipv6MyMask(ipv6mask)
 	firstIP := make([]byte, 16)
-	for idx, _ := range ip6 {
-		firstIP[idx] = ip6[idx] & mask[idx]
+	// for idx, _ := range ip6 {
+	for i := 0; i < len(ipv6); i++ {
+		firstIP[i] = ip6[i] & mask[i]
 		// secondIP[idx] = ip6[idx] | ^mask[idx] //it will find last address
 	}
 	return fmt.Sprintf("%s/%s", formatIPv6(firstIP), val[1]), fmt.Sprintf("%s/%s", formatIPv6(incv6IP(firstIP)), val[1])
@@ -66,8 +67,9 @@ func GetNetworkAddr(ipv6str string, logf *logrus.Logger) string {
 	ip6 := v[1:]
 	mask := ipv6MyMask(ipv6mask)
 	networkAddr := make([]byte, 16)
-	for idx, _ := range ip6 {
-		networkAddr[idx] = ip6[idx] & mask[idx]
+	// for idx, _ := range ip6 {
+	for i := 0; i < len(ipv6); i++ {
+		networkAddr[i] = ip6[i] & mask[i]
 		// secondIP[idx] = ip6[idx] | ^mask[idx] //it will find last address
 	}
 	return fmt.Sprintf("%s/%s", formatIPv6(networkAddr), val[1])

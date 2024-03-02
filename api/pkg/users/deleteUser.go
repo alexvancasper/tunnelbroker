@@ -17,7 +17,7 @@ func (h handler) DeleteUser(c *gin.Context) {
 	var user models.User
 
 	if result := h.DB.First(&user, userId); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}
 

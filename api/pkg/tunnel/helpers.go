@@ -50,7 +50,11 @@ func getPrefix(prefixlen int, logf *logrus.Logger) string {
 	var Prefix struct {
 		Prefix string `json:"prefix"`
 	}
-	json.Unmarshal(resBody, &Prefix)
+	err = json.Unmarshal(resBody, &Prefix)
+	if err != nil {
+		l.Errorf("client: unmarshalling error: %s", err)
+		return ""
+	}
 	return Prefix.Prefix
 }
 

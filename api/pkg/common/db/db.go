@@ -18,7 +18,10 @@ func Init(url string) *gorm.DB {
 	}
 
 	DB = db
-	db.AutoMigrate(&models.User{}, &models.Tunnel{})
+	err = db.AutoMigrate(&models.User{}, &models.Tunnel{})
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	return db
 }

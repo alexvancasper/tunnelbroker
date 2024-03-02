@@ -25,13 +25,15 @@ func (h handler) AddTunnel(c *gin.Context) {
 	// получаем тело запроса
 	if err := c.Bind(&body); err != nil {
 		l.Errorf("Not able to bind POST form data err %s", err)
-		c.AbortWithError(http.StatusBadRequest, err)
+		// c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 	var user models.User
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find user with provided API key %s", api)
-		c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		// c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": apiExist.Error})
 		return
 	}
 
@@ -62,20 +64,24 @@ func (h handler) AddTunnel(c *gin.Context) {
 
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find user with provided API (2) key %s", api)
-		c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		// c.AbortWithError(http.StatusNotFound, apiExist.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": apiExist.Error})
+
 		return
 	}
 
 	if result := h.DB.Create(&tunnel); result.Error != nil {
 		l.Errorf("Not able to insert tunnel in to DB %s", result.Error)
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		// c.AbortWithError(http.StatusNotFound, result.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}
 
 	data, err := tunnel.Marshal()
 	if err != nil {
 		l.Errorf("Error of marshalling tunnel data %s", err)
-		c.AbortWithError(http.StatusInternalServerError, err)
+		// c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
 		return
 	}
 
@@ -83,7 +89,8 @@ func (h handler) AddTunnel(c *gin.Context) {
 		err = h.Msg.PublishMsg(data, broker.ADD)
 		if err != nil {
 			l.Errorf("Error of sending tunnel data to server %s", err)
-			c.AbortWithError(http.StatusInternalServerError, err)
+			// c.AbortWithError(http.StatusInternalServerError, err)
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
 			return
 		}
 	}()

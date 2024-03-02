@@ -17,7 +17,7 @@ type AddUserRequestBody struct {
 func (h handler) AddUser(c *gin.Context) {
 	body := AddUserRequestBody{}
 	if err := c.Bind(&body); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
 
@@ -28,7 +28,7 @@ func (h handler) AddUser(c *gin.Context) {
 	user.API = generateAPI()
 
 	if result := h.DB.Create(&user); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}
 

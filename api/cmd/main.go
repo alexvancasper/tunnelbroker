@@ -75,5 +75,8 @@ func main() {
 	users.RegisterRoutes(r, h, MyLogger)
 	tunnels.RegisterRoutes(r, h, m, MyLogger)
 
-	r.Run(port)
+	err = r.Run(port)
+	if err != nil {
+		MyLogger.Fatalf("Run not able to launch error: %s", err)
+	}
 }
