@@ -31,7 +31,7 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
-          working-directory: api/cmd/
+          working-directory: api/...
           args: --timeout=10m --config=.golangci.yml --issues-exit-code=0 
 
   # tests:
