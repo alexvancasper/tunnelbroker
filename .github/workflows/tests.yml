@@ -1,4 +1,4 @@
-name: Otus homework tests
+name: Linters test
 
 on:
   push:
@@ -28,7 +28,7 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
-          # working-directory: ${{ env.BRANCH }}
+          working-directory: api/cmd/
 
   # tests:
   #   runs-on: ubuntu-latest
