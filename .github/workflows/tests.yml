@@ -24,6 +24,9 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       
+      - name: Check folders
+        run: ls -al 
+        
       - name: Linters
         uses: golangci/golangci-lint-action@v4
         with:
