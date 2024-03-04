@@ -23,16 +23,19 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       
-      - name: Check folders
-        run: ls -al api/
+      - name: Change folder
+        run: cd api
+      
+      - name: Go mod tidy
+        run: go mod tidy
         
       - name: Linters
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
           install-mode: "goinstall"
-          working-directory: api/cmd/
-          args: -v --timeout=10m --config=../.golangci.yml 
+          # working-directory: api/cmd/
+          args: -v --timeout=10m --config=.golangci.yml 
 
   # tests:
   #   runs-on: ubuntu-latest
