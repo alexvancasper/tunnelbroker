@@ -23,9 +23,15 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v4
       
-      - name: Change folder
+      - name: Directory listing
+        run: ls -al 
+
+      - name: Change directory
         run: cd api
-      
+
+      - name: Directory listing
+        run: ls -al 
+
       - name: Go mod tidy
         run: go mod tidy
         
