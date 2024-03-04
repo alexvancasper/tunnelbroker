@@ -13,7 +13,6 @@ import (
 )
 
 func GetAcquirePrefixlenHandler(params operations.GetAcquireParams) middleware.Responder {
-
 	l := SHandler.Log.WithFields(logrus.Fields{
 		"function": "GetAcquirePrefixlenHandler",
 	})

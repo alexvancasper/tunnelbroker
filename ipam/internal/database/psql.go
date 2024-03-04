@@ -19,7 +19,6 @@ type Instance struct {
 // number - how many connections in pool
 func New(dsn string, number int) (*Instance, error) {
 	poolConfig, err := pgxpool.ParseConfig(dsn)
-
 	if err != nil {
 		return nil, fmt.Errorf("Connect to DB error: %v", err)
 	}

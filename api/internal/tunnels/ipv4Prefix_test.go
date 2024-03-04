@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCorrectkIP(t *testing.T) {
+func TestCorrectIP(t *testing.T) {
 	req := require.New(t)
 
 	tests := map[string]struct {
@@ -43,5 +43,4 @@ func TestCorrectkIP(t *testing.T) {
 			req.Equal(testCase.want, res)
 		})
 	}
-
 }

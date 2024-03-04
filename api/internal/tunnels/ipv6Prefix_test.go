@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetEndpoints(t *testing.T) {
-	var MyLogger = logrus.New()
+	MyLogger := logrus.New()
 
 	ipv6str := "3a03:abcd:1805:0000:0000:0000:0000:001a/127"
 	start, end := GetEndpoints(ipv6str, MyLogger)
@@ -22,7 +22,7 @@ func TestGetEndpoints(t *testing.T) {
 }
 
 func TestGetNetworkAddr(t *testing.T) {
-	var MyLogger = logrus.New()
+	MyLogger := logrus.New()
 
 	ipv6str := "3a03:abcd:1805:0000:0000:0000:0000:0005/127"
 	start := GetNetworkAddr(ipv6str, MyLogger)
