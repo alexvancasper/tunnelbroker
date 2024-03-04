@@ -3,8 +3,8 @@ package users
 import (
 	"fmt"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/middleware"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -24,7 +24,6 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, logf *logrus.Logger) {
 	routes := r.Group("/user", middleware.RequireAuth)
 	routes.GET("/", h.GetUser)
 	routes.DELETE("/", h.DeleteUser)
-
 }
 
 func getIDfromToken(c *gin.Context) (uint, error) {
@@ -32,5 +31,10 @@ func getIDfromToken(c *gin.Context) (uint, error) {
 	if !exists {
 		return 0, fmt.Errorf("user not found")
 	}
-	return user.(models.User).ID, nil
+	var u models.User
+	var ok bool
+	if u, ok = user.(models.User); !ok {
+		return 0, fmt.Errorf("user assertion failed")
+	}
+	return u.ID, nil
 }

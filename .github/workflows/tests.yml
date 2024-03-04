@@ -1,9 +1,9 @@
-name: Otus homework tests
+name: Linters test
 
 on:
   push:
     branches:
-      - *
+      - "*"
 
 env:
   GO111MODULE: "on"
@@ -11,24 +11,32 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    # if: ${{ !contains(github.ref, 'calendar') }}
     steps:
       - name: Extract branch name
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
           go-version: ~1.21
 
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+      
+      # - name: Directory listing
+      #   run: ls -al 
+
+      - name: Go mod tidy
+        working-directory: api/
+        run: go mod tidy
 
       - name: Linters
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.51.0
-          working-directory: ${{ env.BRANCH }}
+          version: v1.54
+          # install-mode: "goinstall"
+          working-directory: api/
+          args: -v --timeout=10m --config=.golangci.yml 
 
   # tests:
   #   runs-on: ubuntu-latest

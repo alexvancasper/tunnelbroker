@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
-
-	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/controllers"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
-	tunnels "github.com/alexvancasper/TunnelBroker/web/pkg/tunnel"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/users"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/webview"
+	"github.com/alexvancasper/TunnelBroker/web/internal/common/db"
+	"github.com/alexvancasper/TunnelBroker/web/internal/controllers"
+	"github.com/alexvancasper/TunnelBroker/web/internal/middleware"
+	"github.com/alexvancasper/TunnelBroker/web/internal/tunnels"
+	"github.com/alexvancasper/TunnelBroker/web/internal/users"
+	"github.com/alexvancasper/TunnelBroker/web/internal/webview"
 	formatter "github.com/fabienm/go-logrus-formatters"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
@@ -21,9 +20,8 @@ import (
 )
 
 func main() {
-
-	//Initialize Logging connections
-	var MyLogger = logrus.New()
+	// Initialize Logging connections
+	MyLogger := logrus.New()
 
 	gelfFmt := formatter.NewGelf("API")
 	MyLogger.SetFormatter(gelfFmt)
@@ -36,8 +34,8 @@ func main() {
 
 	// Initialize DB connection
 	port := os.Getenv("PORT")
-	dbUrl := os.Getenv("DB_URL")
-	h := db.Init(dbUrl)
+	dbURL := os.Getenv("DB_URL")
+	h := db.Init(dbURL)
 
 	// Initialize message broker connection
 	m, err := broker.MsgBrokerInit(os.Getenv("BROKER_CONN"), os.Getenv("QUEUENAME"))
@@ -75,5 +73,8 @@ func main() {
 	users.RegisterRoutes(r, h, MyLogger)
 	tunnels.RegisterRoutes(r, h, m, MyLogger)
 
-	r.Run(port)
+	err = r.Run(port)
+	if err != nil {
+		MyLogger.Fatalf("Run not able to launch error: %s", err)
+	}
 }

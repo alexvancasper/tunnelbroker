@@ -26,5 +26,4 @@ func RegisterRoutes(r *gin.Engine, db *gorm.DB, m *broker.MsgBroker, logf *logru
 	// routes.PUT("/:id", h.UpdateTunnel)
 	routes.DELETE("/:id", h.DeleteTunnel)
 	// routes.GET("/", h.GetTunnels)
-
 }

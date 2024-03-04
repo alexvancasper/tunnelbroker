@@ -3,12 +3,12 @@ package users
 import (
 	"net/http"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 )
 
 func (h handler) DeleteUser(c *gin.Context) {
-	userId, err := getIDfromToken(c)
+	userID, err := getIDfromToken(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{})
 		return
@@ -16,8 +16,8 @@ func (h handler) DeleteUser(c *gin.Context) {
 
 	var user models.User
 
-	if result := h.DB.First(&user, userId); result.Error != nil {
-		c.AbortWithError(http.StatusNotFound, result.Error)
+	if result := h.DB.First(&user, userID); result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
 		return
 	}
 
