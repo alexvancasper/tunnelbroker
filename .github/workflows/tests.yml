@@ -30,7 +30,7 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.54.0
-          # working-directory: api/
+          working-directory: api/
           args: --timeout=10m --config=./api/.golangci.yml --issues-exit-code=0 
 
   # tests:
