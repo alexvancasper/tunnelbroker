@@ -6,10 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
-
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
-
+	"github.com/alexvancasper/TunnelBroker/web/internal/common/db"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	uuid "github.com/satori/go.uuid"
@@ -28,7 +26,6 @@ func PostSignup(c *gin.Context) {
 		return
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
-
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to read data"})
 		c.Abort()
@@ -84,7 +81,6 @@ func PostLogin(c *gin.Context) {
 		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
 	})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
-
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create session"})
 		c.Abort()

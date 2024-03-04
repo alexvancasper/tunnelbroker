@@ -26,9 +26,8 @@ type Defaults struct {
 }
 
 func main() {
-
-	//Initialize Logging connections
-	var MyLogger = logrus.New()
+	// Initialize Logging connections
+	MyLogger := logrus.New()
 
 	gelfFmt := formatter.NewGelf("IPAM service")
 	MyLogger.SetFormatter(gelfFmt)
@@ -45,7 +44,7 @@ func main() {
 	// dbUrl := viper.Get("DB_URL").(string)
 	dbUrl := os.Getenv("DB_URL")
 
-	//Initialize database connections
+	// Initialize database connections
 	sh.SHandler.DB, err = psql.New(dbUrl, 5)
 	sh.SHandler.Timeout = time.Duration(1000)
 	if err != nil {
@@ -60,7 +59,7 @@ func main() {
 	}
 	MyLogger.Info("Migration is done")
 
-	//API
+	// API
 	swaggerSpec, err := loads.Embedded(handler.SwaggerJSON, handler.FlatSwaggerJSON)
 	if err != nil {
 		log.Fatalln(err)
@@ -108,5 +107,4 @@ func main() {
 	if err := server.Serve(); err != nil {
 		log.Fatalln(err)
 	}
-
 }

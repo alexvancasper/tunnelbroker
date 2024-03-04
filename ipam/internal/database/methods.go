@@ -20,7 +20,6 @@ const (
 )
 
 func (i *Instance) AcquirePrefix(ctx context.Context, prefixLen int64) (string, error) {
-
 	select {
 	case <-ctx.Done():
 		return "", DeadContext
@@ -81,5 +80,4 @@ func (i *Instance) ReleasePrefix(ctx context.Context, prefix string, prefixLen i
 		}
 		return nil
 	}
-
 }
