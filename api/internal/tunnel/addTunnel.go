@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )

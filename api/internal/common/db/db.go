@@ -3,7 +3,7 @@ package db
 import (
 	"log"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

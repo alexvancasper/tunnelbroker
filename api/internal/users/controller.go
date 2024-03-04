@@ -3,8 +3,8 @@ package users
 import (
 	"fmt"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/middleware"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/middleware"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"

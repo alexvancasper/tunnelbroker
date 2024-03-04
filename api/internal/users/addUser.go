@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
 )

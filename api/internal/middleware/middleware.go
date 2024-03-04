@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/alexvancasper/TunnelBroker/web/pkg/common/db"
-	"github.com/alexvancasper/TunnelBroker/web/pkg/models"
+	"github.com/alexvancasper/TunnelBroker/web/internal/common/db"
+	"github.com/alexvancasper/TunnelBroker/web/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
