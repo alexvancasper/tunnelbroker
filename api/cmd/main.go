@@ -8,7 +8,7 @@ import (
 	"github.com/alexvancasper/TunnelBroker/web/internal/common/db"
 	"github.com/alexvancasper/TunnelBroker/web/internal/controllers"
 	"github.com/alexvancasper/TunnelBroker/web/internal/middleware"
-	tunnels "github.com/alexvancasper/TunnelBroker/web/internal/tunnel"
+	"github.com/alexvancasper/TunnelBroker/web/internal/tunnels"
 	"github.com/alexvancasper/TunnelBroker/web/internal/users"
 	"github.com/alexvancasper/TunnelBroker/web/internal/webview"
 	formatter "github.com/fabienm/go-logrus-formatters"
