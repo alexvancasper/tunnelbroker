@@ -10,7 +10,7 @@ output:
   uniq-by-line: false
   path-prefix: ""
   sort-results: true
-    
+
 linters-settings:
   funlen:
     lines: 150
@@ -84,4 +84,3 @@ linters:
     - nakedret
     - errname
     - forcetypeassert
-    
