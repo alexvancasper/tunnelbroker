@@ -31,7 +31,7 @@ jobs:
         with:
           version: v1.51.0
           working-directory: api/cmd/
-          args: --timeout=10m --config=../.golangci.yml --issues-exit-code=0 
+          args: --timeout=10m --config=../.golangci.yml 
 
   # tests:
   #   runs-on: ubuntu-latest
