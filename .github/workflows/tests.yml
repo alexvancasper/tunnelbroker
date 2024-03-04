@@ -33,7 +33,7 @@ jobs:
       - name: Linters
         uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.54
+          version: v1.52
           # install-mode: "goinstall"
           working-directory: api/
           args: -v --timeout=10m --config=.golangci.yml 
