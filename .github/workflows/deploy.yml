@@ -25,7 +25,6 @@ on:
 env:
   HUB_USER: alex129
   API_REPO: api
-  IPAM_REPO: ipam
   TAG_SHORT: 
 
 jobs:
@@ -70,16 +69,9 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ${{ env.API_REPO }}
+          # context: ${{ env.API_REPO }}
           push: true
           tags: ${{ env.HUB_USER }}/${{ env.API_REPO }}:${{ steps.vars.outputs.sha_short }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: ${{ env.IPAM_REPO }}
-          push: true
-          tags: ${{ env.HUB_USER }}/${{ env.IPAM_REPO }}:${{ steps.vars.outputs.sha_short }}
 
   deploy_via_ssh:
     needs: build_and_push
