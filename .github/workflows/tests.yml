@@ -22,12 +22,8 @@ jobs:
 
       - name: Check out code
         uses: actions/checkout@v4
-      
-      # - name: Directory listing
-      #   run: ls -al 
 
       - name: Go mod tidy
-        working-directory: api/
         run: go mod tidy
 
       - name: Linters
@@ -35,7 +31,6 @@ jobs:
         with:
           version: v1.54
           # install-mode: "goinstall"
-          working-directory: api/
           args: -v --timeout=10m --config=.golangci.yml 
 
   # tests:
