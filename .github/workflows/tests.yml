@@ -26,9 +26,9 @@ jobs:
       # - name: Directory listing
       #   run: ls -al 
 
-      # - name: Go mod tidy
-      #   working-directory: api/
-      #   run: go mod tidy
+      - name: Go mod tidy
+        working-directory: api/
+        run: go mod tidy
 
       - name: Linters
         uses: golangci/golangci-lint-action@v4
