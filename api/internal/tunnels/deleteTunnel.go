@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
 	"github.com/alexvancasper/TunnelBroker/web/internal/models"
+	"github.com/alexvancasper/broker"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 )
