@@ -30,8 +30,9 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
+          install-mode: "goinstall"
           working-directory: api/cmd/
-          args: --timeout=10m --config=../.golangci.yml 
+          args: -v --timeout=10m --config=../.golangci.yml 
 
   # tests:
   #   runs-on: ubuntu-latest
