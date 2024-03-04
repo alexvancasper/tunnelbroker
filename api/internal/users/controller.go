@@ -31,5 +31,10 @@ func getIDfromToken(c *gin.Context) (uint, error) {
 	if !exists {
 		return 0, fmt.Errorf("user not found")
 	}
-	return user.(models.User).ID, nil
+	var u models.User
+	var ok bool
+	if u, ok = user.(models.User); !ok {
+		return 0, fmt.Errorf("user assertion failed")
+	}
+	return u.ID, nil
 }
