@@ -1,7 +1,7 @@
 package tunnels
 
 import (
-	"github.com/alexvancasper/TunnelBroker/web/internal/broker"
+	"github.com/alexvancasper/broker"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
