@@ -11,6 +11,9 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api/    
     steps:
       - name: Extract branch name
         run: echo "BRANCH=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
@@ -26,20 +29,14 @@ jobs:
       - name: Directory listing
         run: ls -al 
 
-      - name: Directory listing with wd
-        working-directory: api/
-        run: ls -al 
-        
       - name: Go mod tidy
-        working-directory: api/
         run: go mod tidy
-
 
       - name: Linters
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.51.0
-          install-mode: "goinstall"
+          # install-mode: "goinstall"
           # working-directory: api/cmd/
           args: -v --timeout=10m --config=.golangci.yml 
 
