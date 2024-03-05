@@ -27,7 +27,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find provided API key %s", apiExist.Error)
 		// c.AbortWithError(http.StatusNotFound, apiExist.Error)
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": apiExist.Error})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": apiExist.Error})
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 	if result := h.DB.Where("user_id = ?", user.ID).First(&tunnel, id); result.Error != nil {
 		l.Errorf("Not able to find a user with provided tunnel id %s", result.Error)
 		// c.AbortWithError(http.StatusNotFound, result.Error)
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": result.Error})
 		return
 	}
 
@@ -44,7 +44,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 	if err != nil {
 		l.Errorf("Error of marshalling tunnel data %s", err)
 		// c.AbortWithError(http.StatusInternalServerError, err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -53,7 +53,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 		if err != nil {
 			l.Errorf("Error of sending tunnel data to server %s", err)
 			// c.AbortWithError(http.StatusInternalServerError, err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 	}()

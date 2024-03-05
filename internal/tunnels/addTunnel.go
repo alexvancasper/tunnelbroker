@@ -26,14 +26,14 @@ func (h handler) AddTunnel(c *gin.Context) {
 	if err := c.Bind(&body); err != nil {
 		l.Errorf("Not able to bind POST form data err %s", err)
 		// c.AbortWithError(http.StatusBadRequest, err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	var user models.User
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find user with provided API key %s", api)
 		// c.AbortWithError(http.StatusNotFound, apiExist.Error)
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": apiExist.Error})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": apiExist.Error})
 		return
 	}
 
@@ -42,7 +42,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 		l.Debugf("You have reached tunnel limit %d", user.TunnelLimit)
 		// c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
 		c.AbortWithStatusJSON(http.StatusBadRequest,
-			gin.H{"message": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
+			gin.H{"error": fmt.Sprintf("You have reached tunnel limit %d", user.TunnelLimit)})
 		return
 	}
 
@@ -50,7 +50,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 
 	if !IsIPv4Public(body.IPv4Remote) {
 		l.WithField("input ipv4 address", body.IPv4Remote).Error("Not able to parse")
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "Wrong IPv4 address"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Wrong IPv4 address"})
 		return
 	}
 
@@ -66,7 +66,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {
 		l.Errorf("Not able to find user with provided API (2) key %s", api)
 		// c.AbortWithError(http.StatusNotFound, apiExist.Error)
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": apiExist.Error})
+		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": apiExist.Error})
 
 		return
 	}
@@ -74,7 +74,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 	if result := h.DB.Create(&tunnel); result.Error != nil {
 		l.Errorf("Not able to insert tunnel in to DB %s", result.Error)
 		// c.AbortWithError(http.StatusNotFound, result.Error)
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": result.Error})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": result.Error})
 		return
 	}
 
@@ -82,7 +82,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 	if err != nil {
 		l.Errorf("Error of marshalling tunnel data %s", err)
 		// c.AbortWithError(http.StatusInternalServerError, err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -91,7 +91,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 		if err != nil {
 			l.Errorf("Error of sending tunnel data to server %s", err)
 			// c.AbortWithError(http.StatusInternalServerError, err)
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 	}()
@@ -102,5 +102,5 @@ func (h handler) AddTunnel(c *gin.Context) {
 
 	l.Debugf("Tunnel data: %+v", tunnel)
 	l.Infof("Tunnel created tunnel_id %d", tunnel.ID)
-	c.JSON(http.StatusCreated, gin.H{"message": "tunnel is created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "tunnel created"})
 }

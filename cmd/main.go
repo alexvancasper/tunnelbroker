@@ -57,15 +57,11 @@ func main() {
 	r.Use(sessions.Sessions("session", store))
 	r.Use(csrf.Middleware(option))
 
-	r.StaticFS("/static", http.Dir("./pkg/webview/static"))
-	r.LoadHTMLGlob("./pkg/webview/templates/*")
 	r.GET("/", webview.Index)
 	r.GET("/login", middleware.NotRequireAuth, webview.Login)
 	r.GET("/signup", middleware.NotRequireAuth, webview.Register)
 	r.GET("/logout", controllers.Logout)
 	r.GET("/ip", webview.IP)
-	r.GET("/help", webview.Help)
-	r.GET("/about", webview.About)
 
 	r.POST("/signup", controllers.PostSignup)
 	r.POST("/login", controllers.PostLogin)

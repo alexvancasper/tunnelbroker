@@ -1,0 +1,324 @@
+swagger: "2.0"
+info:
+  version: "1.0.0"
+  title: "Tunnel Broker 6in4.ru"
+  description: "Tunnel broker API json service"
+
+produces:
+  - application/json
+
+securityDefinitions:
+  basicAuth:
+    type: basic
+
+paths:
+  /:
+    get:
+      summary: "Index page"
+      responses:
+        "307":
+          description: "redirect to /login page"
+  /login:
+    get:
+      summary: "login page"
+      responses:
+        "200":
+          description: "login page"
+          schema:
+            $ref: "#/definitions/Token"
+    post:
+      summary: "Login an existing user request"
+      parameters:
+        - in: header
+          name: "X-CSRF-Token"
+          description: "csrf token"
+          required: true
+          type: string
+        - in: body
+          name: user
+          description: "User data"
+          required: true
+          schema:
+           $ref: "#/definitions/LoginUserRequest"      
+      responses:
+        "200":
+          description: "user login"
+          schema:
+            $ref: "#/definitions/Message"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"            
+        "401":
+          description: "Unauthorized"
+          schema:
+            $ref: "#/definitions/Error"            
+        "500":
+          description: "Server internal error"
+          schema:
+            $ref: "#/definitions/Error"            
+  
+
+  /signup:
+    get:
+      summary: "Registration page"
+      responses:
+        "200":
+          description: "signup page"
+          schema:
+            $ref: "#/definitions/Token"
+    post:
+      summary: "Registration request"
+      parameters:
+        - in: header
+          name: "X-CSRF-Token"
+          description: "csrf token"
+          required: true
+          type: string
+        - in: body
+          name: user
+          description: "User data"
+          required: true
+          schema:
+           $ref: "#/definitions/CreateUserRequest"      
+      responses:
+        "201":
+          description: "user created"
+          schema:
+            $ref: "#/definitions/Message"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"            
+        "500":
+          description: "Server internal error"
+          schema:
+            $ref: "#/definitions/Error"            
+
+  /logout:
+    get:
+      summary: "immediately erase cookie - logout of user"
+      security:
+        - basicAuth: []      
+      responses:
+        "200":
+          description: "cookie erased"
+          schema:
+            $ref: "#/definitions/Message"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+  /user/:
+    get:
+      summary: "User environment page"
+      security:
+        - basicAuth: []
+      responses:
+        "200":
+          description: "user page"
+          schema:
+            $ref: "#/definitions/UserPage"
+        "307":
+          description: "if not authorized/token issue/ redirect to login page /login"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      summary: "Delete user"
+      security:
+        - basicAuth: []
+      responses:
+        "200":
+          description: "user deleted"
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
+  /tunnel/{apikey}:
+    post:
+      summary: "create tunnel"
+      security:
+        - basicAuth: []      
+      parameters:
+        - in: header
+          name: "X-CSRF-Token"
+          description: "csrf token"
+          required: true
+          type: string
+        - in: path
+          name: apikey
+          type: string
+          required: true
+        - in: body
+          name: tunnel
+          schema:
+            $ref: "#/definitions/CreateTunnel"
+      responses:
+        "201":
+          description: "tunnel created"
+          schema:
+            $ref: "#/definitions/Message"          
+        "400":
+          description: "Bad request"
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: "User not found"
+          schema:
+            $ref: "#/definitions/Error"
+        "500":
+          description: "Server internal error"
+          schema:
+            $ref: "#/definitions/Error"
+
+  /tunnel/{apikey}/{id}:
+    delete:
+      summary: "delete tunnel"
+      security:
+        - basicAuth: []     
+      parameters:
+        - in: header
+          name: "X-CSRF-Token"
+          description: "csrf token"
+          required: true
+          type: string
+        - in: path
+          name: apikey
+          description: "user api key"
+          type: string
+          required: true
+        - in: path
+          name: id
+          description: "tunnel id"
+          type: integer
+          required: true
+      responses:
+        "200":
+          description: "tunnel deleted"
+        "404":
+          description: "APIkey or Tunnel id not found"
+          schema:
+            $ref: "#/definitions/Error"
+        "500":
+          description: "Server internal error"
+          schema:
+            $ref: "#/definitions/Error"
+
+
+  /help:
+    get:
+      summary: "Help page"
+      responses:
+        "200":
+          description: "simple help page"
+  /about:
+    get:
+      summary: "About page"
+      responses:
+        "200":
+          description: "simple about page"
+
+
+
+definitions: 
+  Token:
+    description: "csrf token from backend"
+    type: object
+    properties: 
+      token:
+        type: string
+  Message:
+    description: "Message from backend"
+    type: object
+    properties: 
+      message:
+        type: string
+  Error:
+    description: "error from backend"
+    type: object
+    properties: 
+      error:
+        type: string
+  CreateUserRequest:
+    description: "create user"
+    type: object
+    properties: 
+      login:
+        type: string
+      password:
+        type: string
+        format: password
+  LoginUserRequest:
+    description: "login user"
+    type: object
+    properties: 
+      login:
+        type: string
+      password:
+        type: string
+        format: password
+  Tunnel:
+    description: "tunnel struct"
+    type: object
+    properties:
+      id:
+        type: integer
+      ipv6clientendpoint:
+        type: string
+        format: ipv6
+      ipv6serverendpoint:
+        type: string
+        format: ipv6
+      pd:
+        type: string
+        format: ipv6
+      ipv4local:
+        type: string
+        format: ipv4
+      ipv4remote:
+        type: string
+        format: ipv4
+  User:
+    description: "user struct"
+    type: object
+    properties:
+      login:
+        type: string
+      apikey:
+        type: string
+      tunnelcount:
+        type: integer
+      tunnellimit:
+        type: integer
+      tunnels:
+        type: array
+        items:
+          $ref: "#/definitions/Tunnel"
+  UserPage:
+    description: "User page"
+    type: object
+    properties: 
+      token:
+        type: string
+      user:
+        type: object
+        items:
+          $ref: "#/definitions/User"
+
+  CreateTunnel:
+    description: "create tunnel request"
+    type: object
+    properties:
+      ipv4remote:
+        type: string
+        format: ipv4

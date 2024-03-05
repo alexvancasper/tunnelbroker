@@ -21,13 +21,13 @@ func PostSignup(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to read request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read request"})
 		c.Abort()
 		return
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 10)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to read data"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read data"})
 		c.Abort()
 		return
 	}
@@ -35,7 +35,7 @@ func PostSignup(c *gin.Context) {
 
 	var userDB models.User
 	if userExist := db.DB.Where("login = ?", body.Email).First(&userDB); userExist.Error == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "User already exist"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User already exist"})
 		c.Abort()
 		return
 	}
@@ -43,11 +43,11 @@ func PostSignup(c *gin.Context) {
 	result := db.DB.Create(&user)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "User is created"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
 }
 
 func PostLogin(c *gin.Context) {
@@ -57,21 +57,21 @@ func PostLogin(c *gin.Context) {
 	}
 
 	if c.Bind(&body) != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "Failed to read request"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read request"})
 		c.Abort()
 		return
 	}
 	var user models.User
 	db.DB.First(&user, "login = ?", body.Email)
 	if user.ID == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		c.Abort()
 		return
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid email or password"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		c.Abort()
 		return
 	}
@@ -82,7 +82,7 @@ func PostLogin(c *gin.Context) {
 	})
 	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to create session"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		c.Abort()
 		return
 	}
@@ -96,20 +96,12 @@ func PostLogin(c *gin.Context) {
 func Logout(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 	if err != nil || len(tokenString) <= 100 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "cookie is not found"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cookie not found"})
 	}
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie("Authorization", tokenString, -1, "", "", false, false)
 	c.JSON(http.StatusOK, gin.H{"message": "logout done"})
 }
-
-// func Validate(c *gin.Context) {
-// 	user, _ := c.Get("user")
-// 	// user.(models.User).Email    -->   to access specific data
-// 	c.JSON(http.StatusOK, gin.H{
-// 		"message": user,
-// 	})
-// }
 
 func generateAPI() string {
 	uuid := uuid.NewV1().String()

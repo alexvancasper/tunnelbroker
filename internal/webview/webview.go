@@ -8,16 +8,14 @@ import (
 )
 
 func Login(c *gin.Context) {
-	c.HTML(http.StatusOK, "login.html", gin.H{
-		"Title": "TunnelBroker 6in4",
-		"Token": csrf.GetToken(c),
+	c.JSON(http.StatusOK, gin.H{
+		"token": csrf.GetToken(c),
 	})
 }
 
 func Register(c *gin.Context) {
-	c.HTML(http.StatusOK, "adduser.html", gin.H{
-		"Title": "TunnelBroker register",
-		"Token": csrf.GetToken(c),
+	c.JSON(http.StatusOK, gin.H{
+		"token": csrf.GetToken(c),
 	})
 }
 
@@ -26,18 +24,9 @@ func Index(c *gin.Context) {
 }
 
 func IP(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"origin": c.RemoteIP()})
+	c.JSON(http.StatusOK, gin.H{
+		"origin":    c.RemoteIP(),
+		"x-real-ip": c.GetHeader("X-REAL-IP"),
+	})
 	c.Abort()
-}
-
-func Help(c *gin.Context) {
-	c.HTML(http.StatusOK, "help.html", gin.H{
-		"Title": "TunnelBroker help page",
-	})
-}
-
-func About(c *gin.Context) {
-	c.HTML(http.StatusOK, "about.html", gin.H{
-		"Title": "TunnelBroker about page",
-	})
 }
