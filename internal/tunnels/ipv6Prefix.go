@@ -8,71 +8,18 @@ import (
 	"strings"
 
 	"github.com/seancfoley/ipaddress-go/ipaddr"
-	"github.com/sirupsen/logrus"
 )
 
-func GetEndpoints(ipv6str string, logf *logrus.Logger) (string, string) {
-	l := logf.WithFields(logrus.Fields{
-		"function": "GetEndpoints",
-	})
-
-	l.Infof("Input prefix %s", ipv6str)
+func GetEndpoints(ipv6str string) (string, string) {
 	val := strings.Split(ipv6str, "/")
-	ipv6addr := val[0]
-	ipv6mask, err := strconv.Atoi(val[1])
-	if err != nil {
-		l.Errorf("not able to convert to integer err %s", err)
-		return "", ""
-	}
-	ipv6 := net.ParseIP(ipv6addr)
-	IPv6Int := big.NewInt(0)
-	IPv6Int.SetBytes(ipv6)
-	v, err := IPv6Int.GobEncode()
-	if err != nil {
-		l.Errorf("not able to encode to bytes err %s", err)
-		return "", ""
-	}
-	ip6 := v[1:]
+	ipv6mask := mask2int(val[1])
+	ip6 := ip2byte(val[0])
 	mask := ipv6MyMask(ipv6mask)
 	firstIP := make([]byte, 16)
-	// for idx, _ := range ip6 {
-	for i := 0; i < len(ipv6); i++ {
+	for i := 0; i < len(ip6); i++ {
 		firstIP[i] = ip6[i] & mask[i]
-		// secondIP[idx] = ip6[idx] | ^mask[idx] //it will find last address
 	}
 	return fmt.Sprintf("%s/%s", formatIPv6(firstIP), val[1]), fmt.Sprintf("%s/%s", formatIPv6(incv6IP(firstIP)), val[1])
-}
-
-func GetNetworkAddr(ipv6str string, logf *logrus.Logger) string {
-	l := logf.WithFields(logrus.Fields{
-		"function": "GetNetworkAddr",
-	})
-	l.Infof("Input prefix %s", ipv6str)
-	val := strings.Split(ipv6str, "/")
-	ipv6addr := val[0]
-	ipv6mask, err := strconv.Atoi(val[1])
-	l.Debugf("Splitted prefixes prefix:%s mask:%s", val[0], val[1])
-	if err != nil {
-		l.Errorf("not able to convert to integer err %s", err)
-		return ""
-	}
-	ipv6 := net.ParseIP(ipv6addr)
-	IPv6Int := big.NewInt(0)
-	IPv6Int.SetBytes(ipv6)
-	v, err := IPv6Int.GobEncode()
-	if err != nil {
-		l.Errorf("not able to encode to bytes err %s", err)
-		return ""
-	}
-	ip6 := v[1:]
-	mask := ipv6MyMask(ipv6mask)
-	networkAddr := make([]byte, 16)
-	// for idx, _ := range ip6 {
-	for i := 0; i < len(ipv6); i++ {
-		networkAddr[i] = ip6[i] & mask[i]
-		// secondIP[idx] = ip6[idx] | ^mask[idx] //it will find last address
-	}
-	return fmt.Sprintf("%s/%s", formatIPv6(networkAddr), val[1])
 }
 
 func formatIPv6(buf []byte) string {
@@ -109,89 +56,30 @@ func incv6IP(ip []byte) []byte {
 	n := len(ip) - 1
 	if ip[n] == 255 {
 		ip[n] = 0
-		incv6IP(ip[:n-1])
+		incv6IP(ip[:n])
 	} else {
 		ip[n]++
 	}
 	return ip
-	// if ip[15] == 255 {
-	// 	ip[15] = 0
-	// 	if ip[14] == 255 {
-	// 		ip[14] = 0
-	// 		if ip[13] == 255 {
-	// 			ip[13] = 0
-	// 			if ip[12] == 255 {
-	// 				ip[12] = 0
-	// 				if ip[11] == 255 {
-	// 					ip[11] = 0
-	// 					if ip[10] == 255 {
-	// 						ip[10] = 0
-	// 						if ip[9] == 255 {
-	// 							ip[9] = 0
-	// 							if ip[8] == 255 {
-	// 								ip[8] = 0
-	// 								if ip[7] == 255 {
-	// 									ip[7] = 0
-	// 									if ip[6] == 255 {
-	// 										ip[6] = 0
-	// 										if ip[5] == 255 {
-	// 											ip[5] = 0
-	// 											if ip[4] == 255 {
-	// 												ip[4] = 0
-	// 												if ip[3] == 255 {
-	// 													ip[3] = 0
-	// 													if ip[2] == 255 {
-	// 														ip[2] = 0
-	// 														if ip[1] == 255 {
-	// 															ip[1] = 0
-	// 															if ip[0] == 255 {
-	// 																ip[0] = 0
-	// 															} else {
-	// 																ip[0]++
-	// 															}
-	// 														} else {
-	// 															ip[1]++
-	// 														}
-	// 													} else {
-	// 														ip[2]++
-	// 													}
-	// 												} else {
-	// 													ip[3]++
-	// 												}
-	// 											} else {
-	// 												ip[4]++
-	// 											}
-	// 										} else {
-	// 											ip[5]++
-	// 										}
-	// 									} else {
-	// 										ip[6]++
-	// 									}
-	// 								} else {
-	// 									ip[7]++
-	// 								}
-	// 							} else {
-	// 								ip[8]++
-	// 							}
-	// 						} else {
-	// 							ip[9]++
-	// 						}
-	// 					} else {
-	// 						ip[10]++
-	// 					}
-	// 				} else {
-	// 					ip[11]++
-	// 				}
-	// 			} else {
-	// 				ip[12]++
-	// 			}
-	// 		} else {
-	// 			ip[13]++
-	// 		}
-	// 	} else {
-	// 		ip[14]++
-	// 	}
-	// } else {
-	// 	ip[15]++
-	// }
+}
+
+func ip2byte(ipaddr string) []byte {
+	ip := net.ParseIP(ipaddr)
+	buf := big.NewInt(0)
+	buf.SetBytes(ip)
+	v, err := buf.GobEncode()
+	if err != nil {
+		fmt.Printf("not able to convert err %s", err)
+		return []byte{}
+	}
+	return v[1:]
+}
+
+func mask2int(m string) int {
+	mask, err := strconv.Atoi(m)
+	if err != nil {
+		fmt.Printf("not able to convert to integer err %s", err)
+		return 0
+	}
+	return mask
 }
