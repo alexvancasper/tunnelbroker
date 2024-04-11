@@ -1,0 +1,66 @@
+{{ define "linux-config" }}
+<div>
+    <p class="h3 mt-5 text-monospace">Общая информация для всех конфигураций</p>
+    <dl class="row">
+        <dt class="col-sm-3"><kbd>NAME1</kbd></dt>
+        <dd class="col-sm-9">
+            <p class="text-monospace">Имя туннельного интерфейса</p>
+        </dd>
+      
+        <dt class="col-sm-3"><kbd>SERVER IP</kbd></dt>
+        <dd class="col-sm-9">
+          <p class="text-monospace">IPv4 адрес сервера туннельного брокера, т.е. нашего сервиса, вы его можете узнать в личном кабинете</p>
+        </dd>
+      
+        <dt class="col-sm-3"><kbd>LOCAL IP</kbd></dt>
+        <dd class="col-sm-9">
+            <p class="text-monospace">Внешний IPv4 адрес с вашей стороны. Адрес обязательно должен быть белым.</p>
+        </dd>
+
+        <dt class="col-sm-3"><kbd>IPv6 CLIENT P2P/127</kbd></dt>
+        <dd class="col-sm-9">
+            <p class="text-monospace">IPv6 адрес туннельного интерфейса. Point-to-point (P2P)</p>
+        </dd>
+        <dt class="col-sm-3"><kbd>IPv6 PD ADDRESS/64</kbd></dt>
+        <dd class="col-sm-9">
+            <p class="text-monospace">IPv6 сеть для адресации устройств внутри вашей домашней сети. Prefix Delegation (PD)</p>
+        </dd>
+      </dl>
+
+    <p class="mt-2 text-monospace">
+        При добавлении IPv6 маршрута, добавляется не default ::/0, а 2000::/3, что очень много.<br/>
+        Это делается для того, чтобы не перебить уже существующие маршруты в системе.
+    </p>
+
+    <var>Если у кого-нибудь есть желание дописать этот мануал, пишите <a href="https://t.me/tunnelsupport">мне</a></var>
+
+    <p class="h4 mt-4 text-monospace">Пример конфигурации для Linux</p>
+В Linux используется SIT туннель подробнее можно прочитать на <a href="https://habr.com/ru/companies/ruvds/articles/457386/">Habr</a>
+    <pre><code>
+<var># Настройка point-to-Point интерфейса в Linux</var>
+ip tunnel add <kbd>NAME1</kbd> mode sit remote <kbd>SERVER IP</kbd> local <kbd>LOCAL IP</kbd>
+ip link set <kbd>NAME1</kbd> up
+ip addr add <kbd>IPv6 CLIENT P2P</kbd>/127 dev <kbd>NAME1</kbd>
+<var># Добавление маршрута</var>
+ip -6 route add 2000::/3 dev <kbd>NAME1</kbd>
+<var># Настройка Prefix Delegation</var>
+ip addr add  <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
+    </code></pre>
+    <p class="mt-2 text-monospace">
+    <var>Данная настройка не является полной, как минимум еще нужно объявить PD префикс внутри домашней сети, но достаточной для IPv6 связности на одном сервере.</var><br/>
+    </p>
+</div>
+{{ end }}
+{{ define "mikrotik-config" }}
+<div>
+    <p class="h4 mt-2 text-monospace">Пример конфигурации для Mikrotik</p>
+    Последние две команды <text class="mt-2 text-monospace">/ipv6 address add</text> добавляют IPv6 адрес на интерфейсы <strong>sit1</strong> и <strong>bridge</strong> соответственно. <br/>
+    <u>У вас в системе могут быть другие имена интерфейсов</u>
+    <pre><code>
+/interface 6to4 add comment="6in4 Tunnel Broker" disabled=no local-address=<kbd>LOCAL IP</kbd> mtu=1380 name=<strong>sit1</strong> remote-address=<kbd>SERVER IP</kbd>
+/ipv6 route add disabled=no distance=1 dst-address=2000::/3 gateway=<kbd>IPv6 SERVER P2P</kbd>/127 scope=30 target-scope=10
+/ipv6 address add address=<kbd>IPv6 CLIENT P2P</kbd>/127 advertise=no disabled=no eui-64=no interface=<strong>sit1</strong>
+/ipv6 address add address=<kbd>IPv6 PD ADDRESS</kbd>/64 advertise=yes disabled=no eui-64=no interface=<strong>bridge</strong>
+    </code></pre>
+</div>
+{{ end }}

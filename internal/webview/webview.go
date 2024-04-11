@@ -41,3 +41,9 @@ func About(c *gin.Context) {
 		"Title": "TunnelBroker about page",
 	})
 }
+
+func Configurations(c *gin.Context) {
+	c.HTML(http.StatusOK, "config.html", gin.H{
+		"Title": "TunnelBroker configuration page",
+	})
+}
