@@ -60,7 +60,7 @@ func (h handler) AddTunnel(c *gin.Context) {
 	tunnel.IPv4Local = getLocalIPv4(h.Logf)
 	tunnel.PD = getPrefix(64, h.Logf)
 	p2pPrefix := getPrefix(127, h.Logf)
-	tunnel.IPv6ClientEndpoint, tunnel.IPv6ServerEndpoint = GetEndpoints(p2pPrefix, h.Logf)
+	tunnel.IPv6ClientEndpoint, tunnel.IPv6ServerEndpoint = GetEndpoints(p2pPrefix)
 	tunnel.Configured = false
 
 	if apiExist := h.DB.Where("api = ?", api).First(&user); apiExist.Error != nil {

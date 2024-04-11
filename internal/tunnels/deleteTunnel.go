@@ -16,9 +16,7 @@ import (
 )
 
 func (h handler) DeleteTunnel(c *gin.Context) {
-	l := h.Logf.WithFields(logrus.Fields{
-		"function": "DeleteTunnel",
-	})
+	l := h.Logf.WithField("function", "DeleteTunnel")
 	id := c.Param("id")
 	api := c.Param("api")
 
@@ -66,7 +64,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 	l.Debugf("user tunnel count decreased %d->%d", user.TunnelCount, newTunnelCount)
 	h.DB.Model(&user).Update("tunnel_count", newTunnelCount)
 
-	networkAddr := GetNetworkAddr(tunnel.IPv6ClientEndpoint, h.Logf)
+	networkAddr, _ := GetEndpoints(tunnel.IPv6ClientEndpoint)
 	releaseIPv6Prefixes(networkAddr, h.Logf)
 	l.Infof("IPv6Endpoint network released %s", networkAddr)
 	releaseIPv6Prefixes(tunnel.PD, h.Logf)
@@ -76,9 +74,7 @@ func (h handler) DeleteTunnel(c *gin.Context) {
 }
 
 func releaseIPv6Prefixes(prefix string, logf *logrus.Logger) {
-	l := logf.WithFields(logrus.Fields{
-		"function": "releaseIPv6Prefixes",
-	})
+	l := logf.WithField("function", "releaseIPv6Prefixes")
 	prefixData := strings.Split(prefix, "/")
 	requestURL := fmt.Sprintf("http://%s/release?prefix=%s&prefixlen=%s", os.Getenv("IPAM"), prefixData[0], prefixData[1])
 	l.Debugf("requestURL %s", requestURL)

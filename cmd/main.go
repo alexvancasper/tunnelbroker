@@ -66,6 +66,7 @@ func main() {
 	r.GET("/ip", webview.IP)
 	r.GET("/help", webview.Help)
 	r.GET("/about", webview.About)
+	r.GET("/configurations", webview.Configurations)
 
 	r.POST("/signup", controllers.PostSignup)
 	r.POST("/login", controllers.PostLogin)
