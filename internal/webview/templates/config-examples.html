@@ -4,9 +4,13 @@
     <dl class="row">
         <dt class="col-sm-3"><kbd>NAME1</kbd></dt>
         <dd class="col-sm-9">
-            <p class="text-monospace">Имя туннельного интерфейса</p>
+            <p class="text-monospace">Имя нового туннельного интерфейса. Может быть любым, например 6in4ru</p>
         </dd>
-      
+        <dt class="col-sm-3"><kbd>NAME2</kbd></dt>
+        <dd class="col-sm-9">
+            <p class="text-monospace">Имя физического интерфейса который уже есть в системе, например eth0, enp0s3, ens3,...</p>
+        </dd>
+
         <dt class="col-sm-3"><kbd>SERVER IP</kbd></dt>
         <dd class="col-sm-9">
           <p class="text-monospace">IPv4 адрес сервера туннельного брокера, т.е. нашего сервиса, вы его можете узнать в личном кабинете</p>
@@ -32,8 +36,6 @@
         Это делается для того, чтобы не перебить уже существующие маршруты в системе.
     </p>
 
-    <var>Если у кого-нибудь есть желание дописать этот мануал, пишите <a href="https://t.me/tunnelsupport">мне</a></var>
-
     <p class="h4 mt-4 text-monospace">Пример конфигурации для Linux</p>
 В Linux используется SIT туннель подробнее можно прочитать на <a href="https://habr.com/ru/companies/ruvds/articles/457386/">Habr</a>
     <pre><code>
@@ -46,11 +48,42 @@ ip -6 route add 2000::/3 dev <kbd>NAME1</kbd>
 <var># Настройка Prefix Delegation</var>
 ip addr add  <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
     </code></pre>
+    <p class="h5 text-monospace">
+        Постоянная конфигурация через NetworkManager
+    </p>
+    <p class="text-monospace">
+    Убедитесь, что в <kbd>/etc/network/interfaces</kbd> есть строка <kbd>source /etc/network/interfaces.d/*</kbd>.<br/>
+    Нужно создать новый файл с именем 6in4ru в <kbd>/etc/network/interfaces.d/</kbd><br/>
+    <kbd>cat | > /etc/network/interfaces.d/6in4ru</kbd><br/>
+    и вставить конфигурацию приведенную ниже, заменив в ней выделенные значения на ваши и нажать <kbd>Ctrl+D</kbd>
+    </p>
+    <pre><code>
+auto <kbd>NAME1</kbd>
+iface <kbd>NAME1</kbd> inet6 v4tunnel
+    local <kbd>LOCAL IP</kbd>
+    endpoint <kbd>SERVER IP</kbd> 
+    ttl 64
+    mtu 1380
+    address <kbd>IPv6 CLIENT P2P</kbd>
+    netmask 127
+    gateway <kbd>IPv6 SERVER P2P</kbd>
+    up ip -6 route add 2000::/3 dev <kbd>NAME1</kbd> metric 1
+    post-up sysctl -w net.ipv4.conf.all.forwarding=1
+    up ip -6 addr add <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
+</code></pre>
+    <p class="mt-1 text-monospace">затем перезапускаем сервис networking</p>
+<kbd>systemctl status networking</kbd><br/>
+<kbd>systemctl restart networking</kbd><br/>
+<kbd>systemctl status networking</kbd><br/>
+
     <p class="mt-2 text-monospace">
     <var>Данная настройка не является полной, как минимум еще нужно объявить PD префикс внутри домашней сети, но достаточной для IPv6 связности на одном сервере.</var><br/>
     </p>
+
 </div>
 {{ end }}
+
+
 {{ define "mikrotik-config" }}
 <div>
     <p class="h4 mt-2 text-monospace">Пример конфигурации для Mikrotik</p>
@@ -58,7 +91,7 @@ ip addr add  <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
     <u>У вас в системе могут быть другие имена интерфейсов</u>
     <pre><code>
 /interface 6to4 add comment="6in4 Tunnel Broker" disabled=no local-address=<kbd>LOCAL IP</kbd> mtu=1380 name=<strong>sit1</strong> remote-address=<kbd>SERVER IP</kbd>
-/ipv6 route add disabled=no distance=1 dst-address=2000::/3 gateway=<kbd>IPv6 SERVER P2P</kbd>/127 scope=30 target-scope=10
+/ipv6 route add disabled=no distance=1 dst-address=2000::/3 gateway=<kbd>IPv6 SERVER P2P</kbd> scope=30 target-scope=10
 /ipv6 address add address=<kbd>IPv6 CLIENT P2P</kbd>/127 advertise=no disabled=no eui-64=no interface=<strong>sit1</strong>
 /ipv6 address add address=<kbd>IPv6 PD ADDRESS</kbd>/64 advertise=yes disabled=no eui-64=no interface=<strong>bridge</strong>
     </code></pre>
