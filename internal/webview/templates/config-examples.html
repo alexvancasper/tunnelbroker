@@ -35,18 +35,30 @@
         При добавлении IPv6 маршрута, добавляется не default ::/0, а 2000::/3, что очень много.<br/>
         Это делается для того, чтобы не перебить уже существующие маршруты в системе.
     </p>
+    <p class="h4 mt-2 text-monospace">Про MTU</p>
+    <p class="mt-2 text-monospace">
+        Максимальное MTU на туннель вычисляется как максимльное MTU принятое в Интернете это 1500 байт - 20 байт на IPv4 заголовок.
+        Получаем на туннельный интерфейс максимально допустимое значение MTU в размере 1480 байт.<br/>
+        В редких случаях возникает проблема с открытием некоторых сайтов по IPv6, хотя при этом они прекрасно открываются по IPv4.
+        Вероятно проблема может заключаться в значении TCP MSS, оно может выставляться больше чем MTU на интерфейсе.<br/>
+        Для установления корректной TCP-сессии с удалённым хостом должно соблюдаться следующее условие:<br/>
+        <b>MSS + заголовок TCP + заголовок IPv6 ≤ MTU</b><br/>
+        Таким образом, максимальный размер<br/><b>MSS = MTU − размер заголовка IPv6 − размер заголовка TCP</b>.<br/>
+        Максимальное значение MSS при прохождении трафика через туннельный интерфейс составляет<br/>
+        <b>1440(MSS) = 1480(MTU) - 40(IPv6 header size) - 20(TCP header size)</b>
+    </p>
 
     <p class="h4 mt-4 text-monospace">Пример конфигурации для Linux</p>
 В Linux используется SIT туннель подробнее можно прочитать на <a href="https://habr.com/ru/companies/ruvds/articles/457386/">Habr</a>
     <pre><code>
-<var># Настройка point-to-Point интерфейса в Linux</var>
+<var># Настройка point-to-point (SIT) интерфейса в Linux</var>
 ip tunnel add <kbd>NAME1</kbd> mode sit remote <kbd>SERVER IP</kbd> local <kbd>LOCAL IP</kbd>
 ip link set <kbd>NAME1</kbd> up
 ip addr add <kbd>IPv6 CLIENT P2P</kbd>/127 dev <kbd>NAME1</kbd>
 <var># Добавление маршрута</var>
 ip -6 route add 2000::/3 dev <kbd>NAME1</kbd>
 <var># Настройка Prefix Delegation</var>
-ip addr add  <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
+ip addr add <kbd>IPv6 PD ADDRESS</kbd>/64 dev <kbd>NAME2</kbd>
     </code></pre>
     <p class="h5 text-monospace">
         Постоянная конфигурация через NetworkManager
@@ -63,7 +75,7 @@ iface <kbd>NAME1</kbd> inet6 v4tunnel
     local <kbd>LOCAL IP</kbd>
     endpoint <kbd>SERVER IP</kbd> 
     ttl 64
-    mtu 1380
+    mtu 1480
     address <kbd>IPv6 CLIENT P2P</kbd>
     netmask 127
     gateway <kbd>IPv6 SERVER P2P</kbd>
@@ -90,7 +102,7 @@ iface <kbd>NAME1</kbd> inet6 v4tunnel
     Последние две команды <text class="mt-2 text-monospace">/ipv6 address add</text> добавляют IPv6 адрес на интерфейсы <strong>sit1</strong> и <strong>bridge</strong> соответственно. <br/>
     <u>У вас в системе могут быть другие имена интерфейсов</u>
     <pre><code>
-/interface 6to4 add comment="6in4 Tunnel Broker" disabled=no local-address=<kbd>LOCAL IP</kbd> mtu=1380 name=<strong>sit1</strong> remote-address=<kbd>SERVER IP</kbd>
+/interface 6to4 add comment="6in4 Tunnel Broker" disabled=no local-address=<kbd>LOCAL IP</kbd> mtu=1480 name=<strong>sit1</strong> remote-address=<kbd>SERVER IP</kbd>
 /ipv6 route add disabled=no distance=1 dst-address=2000::/3 gateway=<kbd>IPv6 SERVER P2P</kbd> scope=30 target-scope=10
 /ipv6 address add address=<kbd>IPv6 CLIENT P2P</kbd>/127 advertise=no disabled=no eui-64=no interface=<strong>sit1</strong>
 /ipv6 address add address=<kbd>IPv6 PD ADDRESS</kbd>/64 advertise=yes disabled=no eui-64=no interface=<strong>bridge</strong>
