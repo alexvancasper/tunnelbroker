@@ -34,7 +34,7 @@ func NotRequireAuth(c *gin.Context) {
 	token, err := jwt.Parse(tokenString, signTokenFunc)
 	if err == nil || token != nil {
 		fmt.Printf("error, already authorized\n")
-		c.Redirect(http.StatusTemporaryRedirect, "/user/")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
@@ -46,7 +46,7 @@ func RequireAuth(c *gin.Context) {
 	tokenString, err := c.Cookie("Authorization")
 	if err != nil {
 		fmt.Printf("error, not authorized %v\n", err)
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 	}
 
@@ -54,7 +54,7 @@ func RequireAuth(c *gin.Context) {
 	token, err := jwt.Parse(tokenString, signTokenFunc)
 
 	if err != nil || !token.Valid {
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
@@ -64,7 +64,7 @@ func RequireAuth(c *gin.Context) {
 
 	if claims, ok = token.Claims.(jwt.MapClaims); !ok {
 		fmt.Printf("error, not authorized\n")
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
@@ -72,13 +72,13 @@ func RequireAuth(c *gin.Context) {
 	expiryAt, err := claims.GetExpirationTime()
 	if err != nil {
 		fmt.Printf("error, not authorized %s\n", "token issue, not able to get expiration time")
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
 	if expiryAt.Before(time.Now()) {
 		fmt.Print("token expired\n")
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 		return
 	}
@@ -89,7 +89,7 @@ func RequireAuth(c *gin.Context) {
 
 	if user.ID == 0 {
 		fmt.Printf("error, not authorized\n")
-		c.Redirect(http.StatusTemporaryRedirect, "/login")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		c.Abort()
 	}
 	c.Set("user", user)

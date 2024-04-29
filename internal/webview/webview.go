@@ -20,7 +20,7 @@ func Register(c *gin.Context) {
 }
 
 func Index(c *gin.Context) {
-	c.Redirect(http.StatusTemporaryRedirect, "/login")
+	Login(c)
 }
 
 func IP(c *gin.Context) {
