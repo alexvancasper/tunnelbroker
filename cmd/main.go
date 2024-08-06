@@ -46,7 +46,8 @@ func main() {
 
 	store := cookie.NewStore([]byte(os.Getenv("COOKIEKEY1")))
 	option := csrf.Options{
-		Secret: os.Getenv("COOKIEKEY2"),
+		IgnoreMethods: []string{"PUT", "GET"},
+		Secret:        os.Getenv("COOKIEKEY2"),
 		ErrorFunc: func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "CSRF token mismatch"})
 			c.Abort()

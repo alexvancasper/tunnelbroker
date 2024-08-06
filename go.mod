@@ -3,7 +3,7 @@ module github.com/alexvancasper/TunnelBroker/web
 go 1.20
 
 require (
-	github.com/alexvancasper/broker v0.0.0-20240304221347-e58ff4a4d5df
+	github.com/alexvancasper/broker v1.0.2
 	github.com/fabienm/go-logrus-formatters v1.0.0
 	github.com/gin-contrib/sessions v0.0.0-20190101140330-dc5246754963
 	github.com/gin-gonic/gin v1.9.1

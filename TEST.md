@@ -266,3 +266,29 @@ curl -v --request GET \
 --header 'Content-Type: application/json' \
 --cookie 'Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDk2NDM5MzksInN1YiI6MX0.OkG4ah5OrFL5bVUaZDoObBo-KWWLI8ADHJBb5H9s7bI; Path=/; Max-Age=2592000; HttpOnly; SameSite=Lax'
 ```
+
+
+
+
+curl -v --request PUT \
+--url http://127.0.0.1:8080/tunnel/092278bc531611efa5da5254008fe454/50 \
+--header 'Content-Type: application/json' \
+--data '{"ipv4remote": "2.2.2.2"}'
+
+
+c183ebb6c42011eeaeed5254008fe454
+
+
+"cmd1: /sbin/ip tunnel add 5c94a4 mode sit remote 175.175.123.1 local 1.1.1.1","timestamp":1722855429.8560781,"version":"1.1"}
+{"_function":"ExecAddCmd","_level_name":"DEBUGGING","host":"agent","level":7,"short_message":"cmd2: /sbin/ip link set 5c94a4 up","timestamp":1722855429.8649323,"version":"1.1"}
+{"_function":"ExecAddCmd","_level_name":"DEBUGGING","host":"agent","level":7,"short_message":"cmd3: /sbin/ip addr add 3a03:abcd:1805::63/127 dev 5c94a4","timestamp":1722855429.867783,"version":"1.1"}
+{"_function":"ExecAddCmd","_level_name":"DEBUGGING","host":"agent","level":7,"short_message":"cmd4: ip addr add 3a03:abcd:1805::63/127 dev 5c94a4","timestamp":1722855429.8708832,"version":"1.1"}
+
+
+/sbin/ip tunnel add 5c94a4 mode sit remote 175.175.123.1 local 1.1.1.1
+/sbin/ip link set 5c94a4 up
+/sbin/ip addr add 3a03:abcd:1805::63/127 dev 5c94a4
+/sbin/ip -6 route add 3a03:abcd:1805:1031:0000:0000:0000:0000/64 dev 5c94a4
+
+ip -6 route del 3a03:abcd:1805:1031:0000:0000:0000:0000/64 dev 5c94a4
+ip tunnel del 5c94a4
