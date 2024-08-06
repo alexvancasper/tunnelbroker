@@ -1,6 +1,6 @@
 {{ template "header" . }}
     <center>
-    <table class="table table-bordered mt-5 w-50">
+    <table class="table table-bordered mt-5 w-55">
             <tr >
                 <th>Login</th>
                 <td><p class="text-monospace">{{ .User.Login }}</p></td>
@@ -20,6 +20,8 @@
         {{ if lt .User.TunnelCount .User.TunnelLimit }}
             {{ template "addtunnel2" . }}
         {{ end }}
+
+    {{ template "UpdateTunnel" . }}
 </center>
 <br>  
 

@@ -207,30 +207,30 @@ addtunnel.onsubmit = async (e) => {
     {{ if .User.Tunnels }}
     <input type="hidden" name="csrf_token" value="{{ .Token }}">
         {{range $index, $element := .User.Tunnels }}
-            <table border="1" class="table table-bordered mt-5 w-50 text-monospace">
+            <table border="2" class="table table-bordered mt-5 w-55 text-monospace">
             <tr>
-                <th> ID </th>
+                <th> ID <br><kbd>TUNNEL ID</kbd></th>
                 <td> {{ $element.ID }}  </td>
             </tr>
             <tr>
-                <th> IPv4 Client address</th>
+                <th> IPv4 Client address<br><kbd>LOCAL IP</kbd></th>
                 <td> {{ $element.IPv4Remote }}  </td>
             </tr>
             <tr>
-                <th> IPv4 Server address </th>
+                <th> IPv4 Server address <br><kbd>SERVER IP</kbd> </th>
                 <td> {{ $element.IPv4Local }}  </td>
             </tr>
             <tr>
-                <th> IPv6 client address </th>
+                <th> IPv6 client address <br><kbd>IPv6 CLIENT P2P</kbd></th>
                 <td> {{ $element.IPv6ClientEndpoint }}  </td>
             </tr>    
             <tr>
-                <th> IPv6 server address </th>
+                <th> IPv6 server address <br><kbd>IPv6 SERVER P2P</kbd></th>
                 <td> {{ $element.IPv6ServerEndpoint }}  </td>
             </tr>    
 
             <tr>
-                <th> IPv6 PD prefix </th>
+                <th> IPv6 PD prefix <br><kbd>IPv6 PD ADDRESS/64</kbd></th>
                 <td> {{ $element.PD }}  </td>
             </tr>    
             <tr>
@@ -316,4 +316,23 @@ addtunnel.onsubmit = async (e) => {
       });
     };
     </script>
+{{ end }}
+
+{{ define "UpdateTunnel" }}
+<br><br>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <p class="h6 mt-4 text-monospace">Динамическое обновление "IPv4 Client address"</p>
+            <p class="text-monospace" align="left">
+            curl -v --request PUT \<br>
+              --url https://6in4.ru/tunnel/{{ .User.API }}/<kbd>TUNNEL ID</kbd> \<br>
+              --header 'Content-Type: application/json' \<br>
+              --data '{"ipv4remote": "<kbd>NEW LOCAL IP</kbd>"}'<br>
+            <pre><code>
+            </code></pre>
+            </p>
+        </div>
+</div>
+</div>
 {{ end }}
