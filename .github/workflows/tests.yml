@@ -32,6 +32,6 @@ jobs:
         uses: golangci/golangci-lint-action@v4
         with:
           version: v1.56.2
+          skip-cache: true
           # install-mode: "goinstall"
           args: -v --timeout=10m --config=.golangci.yml 
-          
