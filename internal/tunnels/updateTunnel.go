@@ -1,6 +1,8 @@
 package tunnels
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 
@@ -15,6 +17,14 @@ type UpdateTunnelRequestBody struct {
 	IPv4Remote string `json:"ipv4remote"`
 }
 
+func (u UpdateTunnelRequestBody) Validate() error {
+	netaddr := net.ParseIP(u.IPv4Remote)
+	if netaddr == nil {
+		return fmt.Errorf("bad ipv4 address")
+	}
+	return nil
+}
+
 func (h handler) UpdateTunnel(c *gin.Context) {
 	l := h.Logf.WithFields(logrus.Fields{
 		"function": "UpdateTunnel",
@@ -26,7 +36,7 @@ func (h handler) UpdateTunnel(c *gin.Context) {
 		return
 	}
 	api, ok := c.Params.Get("api")
-	if !ok {
+	if !ok || len(api) != 32 {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "api does not exists"})
 		return
 	}
@@ -40,10 +50,14 @@ func (h handler) UpdateTunnel(c *gin.Context) {
 	body := UpdateTunnelRequestBody{}
 
 	// получаем тело запроса
-	if err := c.BindJSON(&body); err != nil {
+	if err := c.ShouldBindJSON(&body); err != nil {
 		// c.AbortWithError(http.StatusBadRequest, err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-
+		return
+	}
+	err = body.Validate()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
